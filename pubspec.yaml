@@ -44,6 +44,7 @@ dependencies:
   google_fonts: ^0.2.0
   flutter_auth_buttons: ^0.6.0
   uuid: ^2.0.4
+  floating_search_bar: ^0.2.0
   
 
 dev_dependencies:
@@ -90,6 +91,9 @@ flutter:
           style: italic
         - asset: assets/fonts/product-sans/Product-Sans-Bold.ttf
           weight: 700
+    - family: CustomIcons
+      fonts:
+        - asset: assets/fonts/CustomIcons.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

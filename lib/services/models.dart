@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 //// Embedded Maps
 
 class Option {
@@ -5,7 +7,7 @@ class Option {
   String detail;
   bool correct;
 
-  Option({ this.correct, this.value, this.detail });
+  Option({this.correct, this.value, this.detail});
   Option.fromMap(Map data) {
     value = data['value'];
     detail = data['detail'] ?? '';
@@ -13,15 +15,15 @@ class Option {
   }
 }
 
-
 class Question {
   String text;
   List<Option> options;
-  Question({ this.options, this.text });
+  Question({this.options, this.text});
 
   Question.fromMap(Map data) {
     text = data['text'] ?? '';
-    options = (data['options'] as List ?? []).map((v) => Option.fromMap(v)).toList();
+    options =
+        (data['options'] as List ?? []).map((v) => Option.fromMap(v)).toList();
   }
 }
 
@@ -35,26 +37,36 @@ class Request {
   String description;
   String requesterUid;
   String requesterDisplayName;
-  DateTime lastUpdated;
+  String requesterPhotoUrl;
+  Timestamp lastUpdated;
 
-  Request({ this.id, this.title, this.location, this.compensation, this.description, this.requesterUid, this.requesterDisplayName, this.lastUpdated });
+  Request(
+      {this.id,
+      this.title,
+      this.location,
+      this.compensation,
+      this.description,
+      this.requesterUid,
+      this.requesterDisplayName,
+      this.requesterPhotoUrl,
+      this.lastUpdated});
 
-  factory Request.fromMap(Map data) {
-    return Request(
-      id: data['id'] ?? '',
-      title: data['title'] ?? '',
-      location: data['location'] ?? '',
-      compensation: data['compensation'] ?? '',
-      description: data['description'] ?? '',
-      requesterUid: data['requesterUid'] ?? '',
-      requesterDisplayName: data['requesterDisplayName'] ?? '',
-      lastUpdated: data['lastUpdated']
-    );
-  }
+  // factory Request.fromMap(Map data) {
+  //   return Request(
+  //     id: data['id'] ?? '',
+  //     title: data['title'] ?? '',
+  //     location: data['location'] ?? '',
+  //     compensation: data['compensation'] ?? '',
+  //     description: data['description'] ?? '',
+  //     requesterUid: data['requesterUid'] ?? '',
+  //     requesterDisplayName: data['requesterDisplayName'] ?? '',
+  //     lastUpdated: data['lastUpdated']
+  //   );
+  // }
 
 }
 
-class Quiz { 
+class Quiz {
   String id;
   String title;
   String description;
@@ -62,30 +74,35 @@ class Quiz {
   String topic;
   List<Question> questions;
 
-  Quiz({ this.title, this.questions, this.video, this.description, this.id, this.topic });
+  Quiz(
+      {this.title,
+      this.questions,
+      this.video,
+      this.description,
+      this.id,
+      this.topic});
 
   factory Quiz.fromMap(Map data) {
     return Quiz(
-      id: data['id'] ?? '',
-      title: data['title'] ?? '',
-      topic: data['topic'] ?? '',
-      description: data['description'] ?? '',
-      video: data['video'] ?? '',
-      questions: (data['questions'] as List ?? []).map((v) => Question.fromMap(v)).toList()
-    );
+        id: data['id'] ?? '',
+        title: data['title'] ?? '',
+        topic: data['topic'] ?? '',
+        description: data['description'] ?? '',
+        video: data['video'] ?? '',
+        questions: (data['questions'] as List ?? [])
+            .map((v) => Question.fromMap(v))
+            .toList());
   }
-  
 }
-
 
 class Topic {
   final String id;
   final String title;
-  final  String description;
+  final String description;
   final String img;
   final List<Quiz> quizzes;
 
-  Topic({ this.id, this.title, this.description, this.img, this.quizzes });
+  Topic({this.id, this.title, this.description, this.img, this.quizzes});
 
   factory Topic.fromMap(Map data) {
     return Topic(
@@ -93,12 +110,12 @@ class Topic {
       title: data['title'] ?? '',
       description: data['description'] ?? '',
       img: data['img'] ?? 'default.png',
-      quizzes:  (data['quizzes'] as List ?? []).map((v) => Quiz.fromMap(v)).toList(), //data['quizzes'],
+      quizzes: (data['quizzes'] as List ?? [])
+          .map((v) => Quiz.fromMap(v))
+          .toList(), //data['quizzes'],
     );
   }
-
 }
-
 
 class Report {
   String uid;
@@ -106,15 +123,13 @@ class Report {
   dynamic topics;
   DateTime lastActivity;
 
-  Report({ this.uid, this.topics, this.total, this.lastActivity });
+  Report({this.uid, this.topics, this.total, this.lastActivity});
 
   factory Report.fromMap(Map data) {
     return Report(
-      uid: data['uid'],
-      total: data['total'] ?? 0,
-      topics: data['topics'] ?? {},
-      lastActivity: data['lastActivity']
-    );
+        uid: data['uid'],
+        total: data['total'] ?? 0,
+        topics: data['topics'] ?? {},
+        lastActivity: data['lastActivity']);
   }
-
 }

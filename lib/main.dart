@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           //   color: Colors.black87,
           // ),
           // brightness: Brightness.dark,
-          textTheme: GoogleFonts.ralewayTextTheme(
+          textTheme: GoogleFonts.robotoTextTheme(
             Theme.of(context).textTheme,
           ),
           buttonTheme: ButtonThemeData(),

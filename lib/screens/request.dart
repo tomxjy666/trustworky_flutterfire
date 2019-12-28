@@ -18,14 +18,13 @@ class _RequestScreenState extends State<RequestScreen> {
   String description = '';
   String error = '';
 
-
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<FirebaseUser>(context);
     return Scaffold(
         appBar: AppBar(
             title: Text(
-              'Request a Task',
+              'Make a Request',
               style: TextStyle(
                 fontFamily: 'ProductSans',
                 // fontWeight: FontWeight.w500,
@@ -50,14 +49,18 @@ class _RequestScreenState extends State<RequestScreen> {
                             cursorColor: Colors.green,
                             decoration: InputDecoration(
                                 hintText: 'Use an eye catching title',
+                                hintStyle: TextStyle(color: Colors.grey),
                                 focusColor: Colors.green,
                                 fillColor: Colors.green,
                                 hoverColor: Colors.green,
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.green[200])),
                                 focusedBorder: OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Colors.green[100])),
                                 labelText: 'Title',
-                                labelStyle: TextStyle(color: Colors.green)),
+                                labelStyle: TextStyle(color: Colors.grey[700])),
                             validator: (value) {
                               if (value.isEmpty) {
                                 return 'Please enter some text';
@@ -77,14 +80,18 @@ class _RequestScreenState extends State<RequestScreen> {
                             cursorColor: Colors.green,
                             decoration: InputDecoration(
                                 hintText: 'i.e. Singapore',
+                                hintStyle: TextStyle(color: Colors.grey),
                                 focusColor: Colors.green,
                                 fillColor: Colors.green,
                                 hoverColor: Colors.green,
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.green[200])),
                                 focusedBorder: OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Colors.green[100])),
                                 labelText: 'Location',
-                                labelStyle: TextStyle(color: Colors.green)),
+                                labelStyle: TextStyle(color: Colors.grey[700])),
                             validator: (value) {
                               if (value.isEmpty) {
                                 return 'Please enter some text';
@@ -105,14 +112,18 @@ class _RequestScreenState extends State<RequestScreen> {
                             cursorColor: Colors.green,
                             decoration: InputDecoration(
                                 hintText: 'S\$',
+                                hintStyle: TextStyle(color: Colors.grey),
                                 focusColor: Colors.green,
                                 fillColor: Colors.green,
                                 hoverColor: Colors.green,
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.green[200])),
                                 focusedBorder: OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Colors.green[100])),
                                 labelText: 'Compensation',
-                                labelStyle: TextStyle(color: Colors.green)),
+                                labelStyle: TextStyle(color: Colors.grey[700])),
                             validator: (value) {
                               if (value.isEmpty) {
                                 return 'Please enter some text';
@@ -129,19 +140,23 @@ class _RequestScreenState extends State<RequestScreen> {
                                 description = val;
                               });
                             },
-                            minLines: 3,
+                            minLines: 1,
                             maxLines: 8,
                             cursorColor: Colors.green,
                             decoration: InputDecoration(
                                 hintText: 'Input specifics of request',
+                                hintStyle: TextStyle(color: Colors.grey),
                                 focusColor: Colors.green,
                                 fillColor: Colors.green,
                                 hoverColor: Colors.green,
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.green[200])),
                                 focusedBorder: OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Colors.green[100])),
                                 labelText: 'Description',
-                                labelStyle: TextStyle(color: Colors.green)),
+                                labelStyle: TextStyle(color: Colors.grey[700])),
                             validator: (value) {
                               if (value.isEmpty) {
                                 return 'Please enter some text';
@@ -161,16 +176,20 @@ class _RequestScreenState extends State<RequestScreen> {
                                 // otherwise.
                                 if (_formKey.currentState.validate()) {
                                   _formKey.currentState.save();
-                                  dynamic requestFormData = await req.updateRequestData(user, title, location, compensation, description);
+                                  dynamic requestFormData =
+                                      await req.updateRequestData(user, title,
+                                          location, compensation, description);
                                   // If the form is valid, display a Snackbar.
-                                  if(requestFormData == null){
+                                  if (requestFormData == null) {
                                     setState(() {
                                       error = 'submit fail';
                                     });
                                   }
                                   Scaffold.of(context).showSnackBar(SnackBar(
-                                      duration: const Duration(seconds: 1),
-                                      content: Text('Request is being processed.')));
+                                      content:
+                                          Text('Request is being processed.')));
+                                  Navigator.pushReplacementNamed(
+                                      context, '/loggedin');
                                 }
                               },
                               color: Colors.green,

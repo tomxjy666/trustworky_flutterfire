@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bubble_bottom_bar/bubble_bottom_bar.dart';
 import 'package:trustworky_flutterfire/screens/screens.dart';
+import 'package:trustworky_flutterfire/shared/shared.dart';
 
 class LoggedInWrapperScreen extends StatefulWidget {
   LoggedInWrapperScreen({Key key}) : super(key: key);
@@ -42,7 +43,8 @@ class _LoggedInWrapperScreenState extends State<LoggedInWrapperScreen> {
               backgroundColor: Colors.green,
               icon: Icon(
                 Icons.add_circle,
-                color: Colors.black,
+                size: 30,
+                color: Colors.grey,
               ),
               activeIcon: Icon(
                 Icons.add_circle,
@@ -53,7 +55,8 @@ class _LoggedInWrapperScreenState extends State<LoggedInWrapperScreen> {
               backgroundColor: Colors.green,
               icon: Icon(
                 Icons.assignment,
-                color: Colors.black,
+                size: 30,
+                color: Colors.grey,
               ),
               activeIcon: Icon(
                 Icons.assignment,
@@ -63,11 +66,14 @@ class _LoggedInWrapperScreenState extends State<LoggedInWrapperScreen> {
           BubbleBottomBarItem(
               backgroundColor: Colors.green,
               icon: Icon(
-                Icons.home,
-                color: Colors.black,
+                // Icons.home,
+                CustomIcons.trustworky,
+                color: Colors.grey,
               ),
               activeIcon: Icon(
-                Icons.home,
+                // Icons.home,
+                CustomIcons.trustworky,
+                size: 20,
                 color: Colors.green,
               ),
               title: Text("Home")),
@@ -75,7 +81,8 @@ class _LoggedInWrapperScreenState extends State<LoggedInWrapperScreen> {
               backgroundColor: Colors.green,
               icon: Icon(
                 Icons.forum,
-                color: Colors.black,
+                size: 30,
+                color: Colors.grey,
               ),
               activeIcon: Icon(
                 Icons.forum,
@@ -85,11 +92,12 @@ class _LoggedInWrapperScreenState extends State<LoggedInWrapperScreen> {
           BubbleBottomBarItem(
               backgroundColor: Colors.green,
               icon: Icon(
-                Icons.person,
-                color: Colors.black,
+                Icons.account_circle,
+                size: 30,
+                color: Colors.grey,
               ),
               activeIcon: Icon(
-                Icons.person,
+                Icons.account_circle,
                 color: Colors.green,
               ),
               title: Text("Profile"))
