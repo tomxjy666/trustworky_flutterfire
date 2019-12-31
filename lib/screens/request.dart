@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/services.dart';
 import 'package:provider/provider.dart';
+import 'package:trustworky_flutterfire/shared/shared.dart';
 
 class RequestScreen extends StatefulWidget {
   @override
@@ -12,7 +13,7 @@ class _RequestScreenState extends State<RequestScreen> {
   final _formKey = GlobalKey<FormState>();
   RequestService req = RequestService();
 
-  String title = '';
+  String category = '';
   String location = '';
   String compensation = '';
   String description = '';
@@ -40,33 +41,69 @@ class _RequestScreenState extends State<RequestScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          TextFormField(
+                          DropDownFormField(
+                            value: category,
                             onChanged: (val) {
                               setState(() {
-                                title = val;
+                                category = val;
                               });
                             },
-                            cursorColor: Colors.green,
-                            decoration: InputDecoration(
-                                hintText: 'Use an eye catching title',
-                                hintStyle: TextStyle(color: Colors.grey),
-                                focusColor: Colors.green,
-                                fillColor: Colors.green,
-                                hoverColor: Colors.green,
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.green[200])),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.green[100])),
-                                labelText: 'Title',
-                                labelStyle: TextStyle(color: Colors.grey[700])),
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return 'Please enter some text';
-                              }
-                              return null;
-                            },
+                            // validator: (value) {
+                            //   if (value.isEmpty) {
+                            //     return 'Please select an option';
+                            //   }
+                            //   return null;
+                            // },
+                            titleText: 'Category',
+                            dataSource: [
+                              {
+                                "display": "Electrician",
+                                "value": "Electrician",
+                              },
+                              {
+                                "display": "Air-Con",
+                                "value": "Air-Con",
+                              },
+                              {
+                                "display": "Plumber",
+                                "value": "Plumber",
+                              },
+                              {
+                                "display": "Car Mechanic",
+                                "value": "Car Mechanic",
+                              },
+                              {
+                                "display": "Locksmith",
+                                "value": "Locksmith",
+                              },
+                              {
+                                "display": "Part-Time",
+                                "value": "Part-Time",
+                              },
+                              {
+                                "display": "Freelance",
+                                "value": "Freelance",
+                              },
+                              {
+                                "display": "Cleaning",
+                                "value": "Cleaning",
+                              },
+                              {
+                                "display": "Movers",
+                                "value": "Movers",
+                              },
+                              {
+                                "display": "Delivery",
+                                "value": "Delivery",
+                              },
+                              {
+                                "display": "Others",
+                                "value": "Others",
+                              },
+                            ],
+                            textField: 'display',
+                            valueField: 'value',
+                            // autovalidate: true,
                           ),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 18.0),
@@ -90,11 +127,14 @@ class _RequestScreenState extends State<RequestScreen> {
                                 focusedBorder: OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Colors.green[100])),
+                                errorBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.red[700])),
                                 labelText: 'Location',
                                 labelStyle: TextStyle(color: Colors.grey[700])),
                             validator: (value) {
                               if (value.isEmpty) {
-                                return 'Please enter some text';
+                                return 'Please input location';
                               }
                               return null;
                             },
@@ -111,7 +151,8 @@ class _RequestScreenState extends State<RequestScreen> {
                             keyboardType: TextInputType.number,
                             cursorColor: Colors.green,
                             decoration: InputDecoration(
-                                hintText: 'S\$',
+                                prefixText: 'S\$',
+                                // hintText: 'S\$',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 focusColor: Colors.green,
                                 fillColor: Colors.green,
@@ -122,11 +163,14 @@ class _RequestScreenState extends State<RequestScreen> {
                                 focusedBorder: OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Colors.green[100])),
+                                errorBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.red[700])),
                                 labelText: 'Compensation',
                                 labelStyle: TextStyle(color: Colors.grey[700])),
                             validator: (value) {
                               if (value.isEmpty) {
-                                return 'Please enter some text';
+                                return 'Please input compensation';
                               }
                               return null;
                             },
@@ -155,11 +199,14 @@ class _RequestScreenState extends State<RequestScreen> {
                                 focusedBorder: OutlineInputBorder(
                                     borderSide:
                                         BorderSide(color: Colors.green[100])),
+                                errorBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.red[700])),
                                 labelText: 'Description',
                                 labelStyle: TextStyle(color: Colors.grey[700])),
                             validator: (value) {
                               if (value.isEmpty) {
-                                return 'Please enter some text';
+                                return 'Please input description of request';
                               }
                               return null;
                             },
@@ -177,8 +224,12 @@ class _RequestScreenState extends State<RequestScreen> {
                                 if (_formKey.currentState.validate()) {
                                   _formKey.currentState.save();
                                   dynamic requestFormData =
-                                      await req.updateRequestData(user, title,
-                                          location, compensation, description);
+                                      await req.updateRequestData(
+                                          user,
+                                          category,
+                                          location,
+                                          compensation,
+                                          description);
                                   // If the form is valid, display a Snackbar.
                                   if (requestFormData == null) {
                                     setState(() {
@@ -194,7 +245,7 @@ class _RequestScreenState extends State<RequestScreen> {
                               },
                               color: Colors.green,
                               label: Text(
-                                'SUBMIT',
+                                'COMPLETE REQUEST',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w600),

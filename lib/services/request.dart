@@ -12,13 +12,13 @@ class RequestService {
   final CollectionReference requestCollection =
       Firestore.instance.collection('requests');
 
-  Future updateRequestData(FirebaseUser user, String title, String location,
+  Future updateRequestData(FirebaseUser user, String category, String location,
       String compensation, String description) {
     DocumentReference requestRef = _db.collection('requests').document();
 
     return requestRef.setData({
       'id': uuid.v1(),
-      'title': title,
+      'category': category,
       'location': location,
       'compensation': compensation,
       'description': description,
@@ -34,7 +34,7 @@ class RequestService {
     return snapshot.documents.map((doc) {
       return Request(
           id: doc.data['id'] ?? '',
-          title: doc.data['title'] ?? '',
+          category: doc.data['category'] ?? '',
           location: doc.data['location'] ?? '',
           compensation: doc.data['compensation'] ?? '',
           description: doc.data['description'] ?? '',

@@ -31,7 +31,7 @@ class Question {
 
 class Request {
   String id;
-  String title;
+  String category;
   String location;
   String compensation;
   String description;
@@ -42,7 +42,7 @@ class Request {
 
   Request(
       {this.id,
-      this.title,
+      this.category,
       this.location,
       this.compensation,
       this.description,

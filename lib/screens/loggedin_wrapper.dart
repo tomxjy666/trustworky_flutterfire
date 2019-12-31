@@ -65,13 +65,12 @@ class _LoggedInWrapperScreenState extends State<LoggedInWrapperScreen> {
               title: Text("Tasks")),
           BubbleBottomBarItem(
               backgroundColor: Colors.green,
-              icon: Icon(
-                // Icons.home,
+              icon: Icon(                
                 CustomIcons.trustworky,
+                // size: 24,
                 color: Colors.grey,
               ),
               activeIcon: Icon(
-                // Icons.home,
                 CustomIcons.trustworky,
                 size: 20,
                 color: Colors.green,

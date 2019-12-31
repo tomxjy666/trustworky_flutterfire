@@ -34,11 +34,7 @@ class MyApp extends StatelessWidget {
 
         // Theme
         theme: ThemeData(
-          // fontFamily: 'Roboto',
-          // bottomAppBarTheme: BottomAppBarTheme(
-          //   color: Colors.black87,
-          // ),
-          // brightness: Brightness.dark,
+          primarySwatch: Colors.green,
           textTheme: GoogleFonts.robotoTextTheme(
             Theme.of(context).textTheme,
           ),
