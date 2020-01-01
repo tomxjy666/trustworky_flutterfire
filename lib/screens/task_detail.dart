@@ -1,19 +1,33 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:trustworky_flutterfire/services/services.dart';
 import 'package:time_formatter/time_formatter.dart';
+import 'package:provider/provider.dart';
+import 'package:trustworky_flutterfire/screens/screens.dart';
 
-class TaskDetailScreen extends StatelessWidget {
+class TaskDetailScreen extends StatefulWidget {
   final Request request;
 
   TaskDetailScreen({Key key, @required this.request}) : super(key: key);
 
   @override
+  _TaskDetailScreenState createState() => _TaskDetailScreenState();
+}
+
+class _TaskDetailScreenState extends State<TaskDetailScreen> {
+  bool _isVisible = true;
+
+  @override
   Widget build(BuildContext context) {
-    String formatted = formatTime((request.lastUpdated.seconds) * 1000 );
+    FirebaseUser user = Provider.of<FirebaseUser>(context);
+    String formatted = formatTime((widget.request.lastUpdated.seconds) * 1000);
+    if (widget.request.requesterUid == user.uid) {
+      _isVisible = false;
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          request.category,
+          widget.request.category,
           style: TextStyle(fontFamily: 'ProductSans', color: Colors.white),
         ),
       ),
@@ -23,23 +37,36 @@ class TaskDetailScreen extends StatelessWidget {
             child: Container(
                 child: Column(
           children: <Widget>[
-            Text(request.category),
-            Text(request.compensation),
-            Text(request.description),
-            Text(request.location),
-            Text(request.requesterDisplayName),
+            Text(widget.request.category),
+            Text(widget.request.compensation),
+            Text(widget.request.description),
+            Text(widget.request.location),
+            Text(widget.request.requesterDisplayName),
             Text(formatted)
           ],
         ))),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        elevation: 4.0,
-        icon: const Icon(Icons.forum),
-        label: const Text('Chat'),
-        onPressed: () {
-          print(request.lastUpdated);
-          print(formatted);
-        },
+      floatingActionButton: Visibility(
+        visible: _isVisible,
+        child: FloatingActionButton.extended(
+          elevation: 4.0,
+          icon: const Icon(Icons.forum),
+          label: const Text('Chat'),
+          onPressed: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                          requestCategory: widget.request.category,
+                          requestCompensation: widget.request.compensation,
+                          requestDescription: widget.request.description,
+                          requestLocation: widget.request.location,
+                          requesterUid: widget.request.requesterUid,
+                          requesterDisplayName: widget.request.requesterDisplayName,
+                          requesterAvatar: widget.request.requesterPhotoUrl,
+                        )));
+          },
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );

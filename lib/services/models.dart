@@ -117,19 +117,25 @@ class Topic {
   }
 }
 
-class Report {
+class User {
   String uid;
-  int total;
-  dynamic topics;
+  String email;
+  bool emailVerified;
+  String phoneNumber;
+  String displayName;
+  String photoUrl;
   DateTime lastActivity;
 
-  Report({this.uid, this.topics, this.total, this.lastActivity});
+  User({this.uid, this.email,this.emailVerified,this.phoneNumber, this.displayName, this.photoUrl, this.lastActivity});
 
-  factory Report.fromMap(Map data) {
-    return Report(
+  factory User.fromMap(Map data) {
+    return User(
         uid: data['uid'],
-        total: data['total'] ?? 0,
-        topics: data['topics'] ?? {},
+        email: data['email'] ?? '',
+        emailVerified: data['emailVerified'],
+        phoneNumber: data['phoneNumber'] ?? '',
+        displayName: data['displayName'] ?? '',
+        photoUrl: data['photoUrl'] ?? '',
         lastActivity: data['lastActivity']);
   }
 }

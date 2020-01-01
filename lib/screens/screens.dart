@@ -10,3 +10,4 @@ export 'tasks.dart';
 export 'task_detail.dart';
 export 'task_list.dart';
 export 'task_tile.dart';
+export 'chat.dart';
