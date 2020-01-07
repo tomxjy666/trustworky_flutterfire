@@ -4,6 +4,8 @@ import 'package:trustworky_flutterfire/services/services.dart';
 import 'package:time_formatter/time_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:trustworky_flutterfire/screens/screens.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TaskDetailScreen extends StatefulWidget {
   final Request request;
@@ -20,6 +22,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<FirebaseUser>(context);
+    // RequestService req = RequestService();
+    SharedPreferences prefs;
+    String groupChatId;
+    String email;
     String formatted = formatTime((widget.request.lastUpdated.seconds) * 1000);
     if (widget.request.requesterUid == user.uid) {
       _isVisible = false;
@@ -42,6 +48,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             Text(widget.request.description),
             Text(widget.request.location),
             Text(widget.request.requesterDisplayName),
+            Text(widget.request.requesterEmail),
             Text(formatted)
           ],
         ))),
@@ -52,19 +59,42 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
           elevation: 4.0,
           icon: const Icon(Icons.forum),
           label: const Text('Chat'),
-          onPressed: () {
+          onPressed: () async {
+            prefs = await SharedPreferences.getInstance();
+            email = prefs.getString('email');
+            groupChatId = '${widget.request.docId}-$email';
+
+            var documentReference =
+                Firestore.instance.collection('rooms').document(groupChatId);
+
+            Firestore.instance.runTransaction((transaction) async {
+              await transaction.set(
+                documentReference,
+                {
+                  'serviceProvider': email,
+                  'serviceProviderDisplayName': user.displayName,
+                  'serviceProviderPhotoUrl': user.photoUrl,
+                  'requester': widget.request.requesterEmail,
+                  'requestDocId': widget.request.docId
+                  // 'created': DateTime.now().millisecondsSinceEpoch.toString()
+                },
+              );
+            });
             Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => ChatScreen(
-                          requestCategory: widget.request.category,
-                          requestCompensation: widget.request.compensation,
-                          requestDescription: widget.request.description,
-                          requestLocation: widget.request.location,
-                          requesterUid: widget.request.requesterUid,
-                          requesterDisplayName: widget.request.requesterDisplayName,
-                          requesterAvatar: widget.request.requesterPhotoUrl,
-                        )));
+                        docId: widget.request.docId,
+                        requestId: widget.request.id,
+                        requestCategory: widget.request.category,
+                        requestCompensation: widget.request.compensation,
+                        requestDescription: widget.request.description,
+                        requestLocation: widget.request.location,
+                        requesterUid: widget.request.requesterUid,
+                        requesterDisplayName:
+                            widget.request.requesterDisplayName,
+                        requesterAvatar: widget.request.requesterPhotoUrl,
+                        requesterEmail: widget.request.requesterEmail)));
           },
         ),
       ),

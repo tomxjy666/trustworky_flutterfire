@@ -12,7 +12,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:trustworky_flutterfire/shared/shared.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatInboxScreen extends StatefulWidget {
+  final String serviceProviderDisplayName;
+  final String serviceProviderPhotoUrl;
+  final String serviceProvider;
   final String docId;
   final String requestId;
   final String requestCategory;
@@ -24,8 +27,11 @@ class ChatScreen extends StatefulWidget {
   final String requesterDisplayName;
   final String requesterEmail;
 
-  ChatScreen(
+  ChatInboxScreen(
       {Key key,
+      @required this.serviceProviderDisplayName,
+      @required this.serviceProviderPhotoUrl,
+      @required this.serviceProvider,
       @required this.docId,
       @required this.requestId,
       @required this.requestCategory,
@@ -39,10 +45,10 @@ class ChatScreen extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  _ChatInboxScreenState createState() => _ChatInboxScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatInboxScreenState extends State<ChatInboxScreen> {
   bool _isVisible = true;
   String uid;
   String email;
@@ -60,13 +66,15 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController listScrollController = new ScrollController();
 
   readLocal() async {
+    print('@@@@@@@@@@@@');
+    print(widget.serviceProviderPhotoUrl);
     prefs = await SharedPreferences.getInstance();
     // get currentUser unique id
     uid = prefs.getString('id') ?? '';
     // get currentUser unique email
-    email = prefs.getString('email') ?? '';
+    // email = prefs.getString('email') ?? '';
     // set groupchatId = request docs id + unique email of serviceProvider
-    groupChatId = '${widget.docId}-$email';
+    groupChatId = '${widget.docId}-${widget.serviceProvider}';
     // Firestore.instance.collection('users').document(uid).updateData({'chattingWith': peerId});
     setState(() {});
   }
@@ -363,7 +371,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             height: 35.0,
                             padding: EdgeInsets.all(10.0),
                           ),
-                          imageUrl: widget.requesterAvatar,
+                          imageUrl: widget.serviceProviderPhotoUrl,
                           width: 35.0,
                           height: 35.0,
                           fit: BoxFit.cover,
@@ -468,8 +476,8 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: ChatBar(
         color: Colors.green,
-        profilePic: widget.requesterAvatar,
-        username: widget.requesterDisplayName,
+        profilePic: widget.serviceProviderPhotoUrl,
+        username: widget.serviceProvider,
         lastseen: '',
         status: ChatBarState.LASTSEEN,
         actions: <Widget>[

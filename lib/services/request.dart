@@ -24,23 +24,34 @@ class RequestService {
       'description': description,
       'requesterDisplayName': user.displayName,
       'requesterUid': user.uid,
+      'requesterEmail': user.email,
       'requesterPhotoUrl': user.photoUrl,
       'lastUpdated': DateTime.now()
     }, merge: true);
   }
 
+  // Future updateRequestServiceProvider(String serviceProvider) {
+  //   DocumentReference requestRef = _db.collection('requests').document();
+  //   return requestRef.updateData({
+  //     'serviceProviders': FieldValue.arrayUnion([serviceProvider])
+  //   });
+  // }
+
   // request list from snapshot
   List<Request> _requestListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
       return Request(
+          docId: doc.documentID,
           id: doc.data['id'] ?? '',
           category: doc.data['category'] ?? '',
           location: doc.data['location'] ?? '',
           compensation: doc.data['compensation'] ?? '',
           description: doc.data['description'] ?? '',
           requesterUid: doc.data['requesterUid'] ?? '',
+          requesterEmail: doc.data['requesterEmail'] ?? '',
           requesterDisplayName: doc.data['requesterDisplayName'] ?? '',
           requesterPhotoUrl: doc.data['requesterPhotoUrl'] ?? '',
+          serviceProviders: doc.data['serviceProviders'],
           lastUpdated: doc.data['lastUpdated'] 
           );
     }).toList();
@@ -51,4 +62,6 @@ class RequestService {
     return requestCollection.snapshots()
       .map(_requestListFromSnapshot);
   }
+
+
 }

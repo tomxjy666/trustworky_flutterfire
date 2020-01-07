@@ -30,6 +30,7 @@ class AuthService {
       final FirebaseUser user = (await _auth.signInWithCredential(credential)).user;
       updateUserData(user);
       await prefs.setString('id', user.uid);
+      await prefs.setString('email', user.email);
       print(user);
       return user;
     } catch (error) {

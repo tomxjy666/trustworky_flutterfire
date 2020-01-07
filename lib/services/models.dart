@@ -29,26 +29,49 @@ class Question {
 
 ///// Database Collections
 
+class Room {
+  String requestDocId;
+  String requester;
+  String serviceProvider;
+  String serviceProviderPhotoUrl;
+  String serviceProviderDisplayName;
+  
+
+  Room({
+    this.requestDocId,
+    this.requester,
+    this.serviceProvider,
+    this.serviceProviderPhotoUrl,
+    this.serviceProviderDisplayName
+  });
+}
+
 class Request {
+  String docId;
   String id;
   String category;
   String location;
   String compensation;
   String description;
   String requesterUid;
+  String requesterEmail;
   String requesterDisplayName;
   String requesterPhotoUrl;
+  List serviceProviders;
   Timestamp lastUpdated;
 
   Request(
-      {this.id,
+      {this.docId,
+      this.id,
       this.category,
       this.location,
       this.compensation,
       this.description,
       this.requesterUid,
+      this.requesterEmail,
       this.requesterDisplayName,
       this.requesterPhotoUrl,
+      this.serviceProviders,
       this.lastUpdated});
 
   // factory Request.fromMap(Map data) {
