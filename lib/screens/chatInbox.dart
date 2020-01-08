@@ -477,7 +477,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
       appBar: ChatBar(
         color: Colors.green,
         profilePic: widget.serviceProviderPhotoUrl,
-        username: widget.serviceProvider,
+        username: widget.serviceProviderDisplayName,
         lastseen: '',
         status: ChatBarState.LASTSEEN,
         actions: <Widget>[
