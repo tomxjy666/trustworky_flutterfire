@@ -5,20 +5,20 @@ import 'package:trustworky_flutterfire/services/services.dart';
 import 'package:trustworky_flutterfire/screens/screens.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class InboxRequestTile extends StatefulWidget {
+class InboxTaskTile extends StatefulWidget {
   final Room room;
-  InboxRequestTile({this.room});
+  InboxTaskTile({this.room});
 
   @override
-  _InboxRequestTileState createState() => _InboxRequestTileState();
+  _InboxTaskTileState createState() => _InboxTaskTileState();
 }
 
-class _InboxRequestTileState extends State<InboxRequestTile> {
+class _InboxTaskTileState extends State<InboxTaskTile> {
   bool _isVisible = false;
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<FirebaseUser>(context);
-    if (widget.room.requester == user.email) {
+    if (widget.room.serviceProvider == user.email) {
       _isVisible = true;
     }
     // String profilePicture =

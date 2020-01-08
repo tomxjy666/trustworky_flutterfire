@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:trustworky_flutterfire/screens/inbox_task.dart';
 import 'package:trustworky_flutterfire/screens/screens.dart';
 // import 'package:trustworky_flutterfire/screens/inbox_list.dart';
 
@@ -30,7 +31,7 @@ class InboxScreen extends StatelessWidget {
         body: TabBarView(
           children: [
             InboxRequest(),
-            Icon(Icons.directions_transit)
+            InboxTask()
           ],
         ),
       ),
