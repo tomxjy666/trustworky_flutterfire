@@ -26,6 +26,7 @@ class ChatService {
           requestDocId: doc.data['requestDocId'] ?? '',
           requester: doc.data['requester'] ?? '',
           serviceProvider: doc.data['serviceProvider'] ?? '',
+          serviceProviderDisplayName: doc.data['serviceProviderDisplayName'] ?? '',
           serviceProviderPhotoUrl: doc.data['serviceProviderPhotoUrl'] ?? '');
     }).toList();
   }

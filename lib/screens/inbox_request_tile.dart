@@ -47,7 +47,7 @@ class _InboxRequestTileState extends State<InboxRequestTile> {
                 backgroundColor: Colors.transparent,
               ),
               title: Text(widget.room.serviceProvider),
-              // subtitle: Text(requestData["category"]),
+              subtitle: Text(widget.room.serviceProviderDisplayName),
               // trailing: Text(request.location),
               onTap: () {
                 Navigator.push(
