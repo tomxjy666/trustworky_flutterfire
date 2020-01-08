@@ -22,8 +22,11 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>CFBundleURLTypes</key>
 	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Need to upload image</string>
 	<key>NSCameraUsageDescription</key>
+	<string>Need to upload image</string>
 	<key>NSMicrophoneUsageDescription</key>
+	<string>Need to upload image</string>
 <array>
 	<dict>
 		<key>CFBundleTypeRole</key>
