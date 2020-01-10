@@ -30,22 +30,26 @@ class Question {
 ///// Database Collections
 
 class Room {
+  String roomId;
   String requestDocId;
   String requester;
   String requestCategory;
   String requesterDisplayName;
   String requesterPhotoUrl;
+  String requestCompensation;
   String serviceProvider;
   String serviceProviderPhotoUrl;
   String serviceProviderDisplayName;
   
 
   Room({
+    this.roomId,
     this.requestDocId,
     this.requester,
     this.requestCategory,
     this.requesterDisplayName,
     this.requesterPhotoUrl,
+    this.requestCompensation,
     this.serviceProvider,
     this.serviceProviderPhotoUrl,
     this.serviceProviderDisplayName
@@ -54,6 +58,7 @@ class Room {
 
 class Request {
   String docId;
+  String status;
   String id;
   String category;
   String location;
@@ -68,6 +73,7 @@ class Request {
 
   Request(
       {this.docId,
+      this.status,
       this.id,
       this.category,
       this.location,

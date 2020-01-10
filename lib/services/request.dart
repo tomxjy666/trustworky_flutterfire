@@ -12,12 +12,14 @@ class RequestService {
   final CollectionReference requestCollection =
       Firestore.instance.collection('requests');
 
+  // post new request
   Future updateRequestData(FirebaseUser user, String category, String location,
       String compensation, String description) {
     DocumentReference requestRef = _db.collection('requests').document();
 
     return requestRef.setData({
       'id': uuid.v1(),
+      'status': 'open',
       'category': category,
       'location': location,
       'compensation': compensation,
@@ -30,12 +32,17 @@ class RequestService {
     }, merge: true);
   }
 
-  // Future updateRequestServiceProvider(String serviceProvider) {
-  //   DocumentReference requestRef = _db.collection('requests').document();
-  //   return requestRef.updateData({
-  //     'serviceProviders': FieldValue.arrayUnion([serviceProvider])
-  //   });
-  // }
+  // update request status to closed
+  Future updateRequestStatus(String docId) {
+    DocumentReference requestRef = _db.collection('requests').document(docId);
+
+    return requestRef.updateData({
+      'status': 'closed',
+      'lastUpdated': DateTime.now()
+    });
+  }
+
+  
 
   // request list from snapshot
   List<Request> _requestListFromSnapshot(QuerySnapshot snapshot) {
@@ -59,7 +66,7 @@ class RequestService {
 
   // get requests stream
   Stream<List<Request>> get requests {
-    return requestCollection.snapshots()
+    return requestCollection.where("status", isEqualTo: "open" ).snapshots()
       .map(_requestListFromSnapshot);
   }
 

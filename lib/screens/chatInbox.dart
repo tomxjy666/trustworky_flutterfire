@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:trustworky_flutterfire/shared/shared.dart';
+import 'package:trustworky_flutterfire/services/services.dart';
 
 class ChatInboxScreen extends StatefulWidget {
   final String serviceProviderDisplayName;
@@ -49,11 +50,16 @@ class ChatInboxScreen extends StatefulWidget {
 }
 
 class _ChatInboxScreenState extends State<ChatInboxScreen> {
+  ChatService chat = ChatService();
   bool _isVisible = true;
+  bool _isAcceptButtonVisible = false;
+  bool _isNegoButtonVisible = false;
+  bool _isConfirmWorkDoneButtonVisible = false;
   String uid;
   String email;
 
   var listMessage;
+  var roomData;
   String groupChatId;
   SharedPreferences prefs;
 
@@ -508,33 +514,81 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                     width: 1,
                   ),
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    ListTile(
-                      // leading: Icon(Icons.thumbs_up_down, size: 32,),
-                      title: Text(
-                          '${widget.requestCategory} @ ${widget.requestLocation}'),
-                      subtitle: Text(widget.requestDescription),
-                      trailing: Text(
-                        'S\$${widget.requestCompensation}',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                    ),
-                    ButtonBar(
+                child: groupChatId == ''
+                    ? Center(
+                        child: CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.green)))
+                    : StreamBuilder(
+                  stream: Firestore.instance
+                            .collection('rooms')
+                            .document(groupChatId)
+                            .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                            return Center(
+                                child: CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.green)));
+                          } else {
+                            roomData = snapshot.data;
+                            if (roomData['jobStatus'] == 'workDone' ) {
+                              _isConfirmWorkDoneButtonVisible = true;
+                            }
+                            if (roomData['jobStatus'] == 'paid' ) {
+                              _isConfirmWorkDoneButtonVisible = false;
+                            }
+                          }
+                            
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        FlatButton(
-                          child: const Text('NEGOTIATE'),
-                          onPressed: () {/* ... */},
+                        ListTile(
+                          leading: Chip(
+                                    // avatar: CircleAvatar(
+                                    //   backgroundColor: Colors.grey[300],
+            
+                                    // ),
+                                    label: Text(roomData['jobStatus']),
+                                  ),
+                          title: Text(
+                              '${widget.requestCategory} @ ${widget.requestLocation}'),
+                          subtitle: Text(widget.requestDescription),
+                          trailing: Text(
+                            'S\$${widget.requestCompensation}',
+                            style: TextStyle(fontSize: 18),
+                          ),
                         ),
-                        MaterialButton(
-                          color: Colors.green,
-                          child: const Text('ACCEPT'),
-                          onPressed: () {/* ... */},
+                        ButtonBar(
+                          children: <Widget>[
+                            Visibility(
+                              visible: _isNegoButtonVisible,
+                                                          child: FlatButton(
+                                child: const Text('NEGOTIATE'),
+                                onPressed: () {/* ... */},
+                              ),
+                            ),
+                            Visibility(
+                              visible: _isAcceptButtonVisible,
+                                                          child: MaterialButton(
+                                color: Colors.green,
+                                child: const Text('ACCEPT'),
+                                onPressed: () {/* ... */},
+                              ),
+                            ),
+                            Visibility(
+                              visible: _isConfirmWorkDoneButtonVisible,
+                                                          child: FlatButton(
+                                child: const Text('CONFIRM WORK DONE'),
+                                onPressed: () async {await chat
+                                              .confirmWorkDoneStatus(groupChatId);},
+                              ),
+                            ),
+                          ],
                         ),
                       ],
-                    ),
-                  ],
+                    );
+                  }
                 ),
               ),
             ),

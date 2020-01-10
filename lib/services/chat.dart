@@ -7,6 +7,7 @@ class ChatService {
   String email;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final Firestore _db = Firestore.instance;
   // FirebaseUser user = await _auth.currentUser();
 
   inputData() async {
@@ -19,11 +20,43 @@ class ChatService {
   final CollectionReference roomCollection =
       Firestore.instance.collection('rooms');
 
+  //update job status pending
+  Future updateJobStatus(String roomId) {
+    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+
+    return requestRef.updateData({
+      'jobStatus': 'pending',
+      'lastUpdated': DateTime.now()
+    });
+  }
+
+  //update job status work done
+  Future updateWorkDoneStatus(String roomId) {
+    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+
+    return requestRef.updateData({
+      'jobStatus': 'workDone',
+      'lastUpdated': DateTime.now()
+    });
+  }    
+
+  //update job status work done confimed
+  Future confirmWorkDoneStatus(String roomId) {
+    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+
+    return requestRef.updateData({
+      'jobStatus': 'paid',
+      'lastUpdated': DateTime.now()
+    });
+  } 
+
   // room list from snapshot
   List<Room> _roomListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
       return Room(
+          roomId: doc.documentID,
           requestDocId: doc.data['requestDocId'] ?? '',
+          requestCompensation: doc.data['requestCompensation'] ?? '',
           requestCategory: doc.data['requestCategory'] ?? '',
           requester: doc.data['requester'] ?? '',
           requesterDisplayName: doc.data['requesterDisplayName'] ?? '',

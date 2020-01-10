@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../services/services.dart';
+import 'package:trustworky_flutterfire/services/services.dart';
 import 'package:provider/provider.dart';
 import 'package:trustworky_flutterfire/shared/shared.dart';
 
