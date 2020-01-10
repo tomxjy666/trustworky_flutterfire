@@ -60,6 +60,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
 
   var listMessage;
   var roomData;
+  var jobStatus;
   String groupChatId;
   SharedPreferences prefs;
 
@@ -532,14 +533,17 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                         Colors.green)));
                           } else {
                             roomData = snapshot.data;
-                            if(roomData['jobStatus'] == null) {
-                              roomData['jobStatus'] = 'open';
-                            }
+                        
                             if (roomData['jobStatus'] == 'workDone' ) {
                               _isConfirmWorkDoneButtonVisible = true;
                             }
                             if (roomData['jobStatus'] == 'paid' ) {
                               _isConfirmWorkDoneButtonVisible = false;
+                            }
+                            if(roomData['jobStatus'] == null) {
+                              jobStatus = 'open';
+                            }else {
+                              jobStatus = roomData['jobStatus'];
                             }
                           }
                             
@@ -552,7 +556,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                     //   backgroundColor: Colors.grey[300],
             
                                     // ),
-                                    label: Text(roomData['jobStatus']),
+                                    label: Text(jobStatus),
                                   ),
                           title: Text(
                               '${widget.requestCategory} @ ${widget.requestLocation}'),

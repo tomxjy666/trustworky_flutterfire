@@ -65,6 +65,7 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
 
   var listMessage;
   var roomData;
+  var jobStatus;
   String groupChatId;
   SharedPreferences prefs;
 
@@ -581,7 +582,9 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                           } else {
                             roomData = snapshot.data;
                             if(roomData['jobStatus'] == null) {
-                              roomData['jobStatus'] = 'open';
+                              jobStatus = 'open';
+                            }else {
+                              jobStatus = roomData['jobStatus'];
                             }
                             if (roomData['jobStatus'] == 'pending') {
                               _isAcceptButtonVisible = false;
@@ -598,7 +601,7 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                               ListTile(
                                 leading: Chip(
                           
-                                  label: Text(roomData['jobStatus']),
+                                  label: Text(jobStatus),
                                 ),
                                 title: Text(
                                     '${widget.requestCategory} @ ${widget.requestLocation}'),

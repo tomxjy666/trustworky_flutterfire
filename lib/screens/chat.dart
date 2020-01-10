@@ -57,7 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   var listMessage;
   var roomData;
-  // var jobStatus;
+  var jobStatus;
   String groupChatId;
   SharedPreferences prefs;
 
@@ -572,7 +572,9 @@ class _ChatScreenState extends State<ChatScreen> {
                           } else {
                             roomData = snapshot.data;
                             if(roomData['jobStatus'] == null) {
-                              roomData['jobStatus'] = 'open';
+                              jobStatus = 'open';
+                            }else {
+                              jobStatus = roomData['jobStatus'];
                             }
                             if (roomData['jobStatus'] == 'pending') {
                               _isAcceptButtonVisible = false;
@@ -589,7 +591,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             children: <Widget>[
                               ListTile(
                                  leading: Chip(
-                                   label: Text(roomData['jobStatus'] ),
+                                   label: Text(jobStatus),
                                  ),
                                 title: Text(
                                     '${widget.requestCategory} @ ${widget.requestLocation}'),
