@@ -563,7 +563,6 @@ class _ChatScreenState extends State<ChatScreen> {
                             .document(groupChatId)
                             .snapshots(),
                         builder: (context, snapshot) {
-                          print('@@@@@${snapshot.hasData}');
                           if (!snapshot.hasData) {
                             return Center(
                                 child: CircularProgressIndicator(
@@ -579,73 +578,63 @@ class _ChatScreenState extends State<ChatScreen> {
                             if (roomData['jobStatus'] == 'workDone') {
                               _isWorkDoneButtonVisible = false;
                             }
-                            // if(roomData['jobStatus' == 'paid']) {
-                            //   _isReviewButtonVisible = true;
-                            // }
-
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                ListTile(
-                                  leading: Chip(
-                                    // avatar: CircleAvatar(
-                                    //   backgroundColor: Colors.grey[300],
-
-                                    // ),
-                                    label: Text(roomData['jobStatus']),
-                                  ),
-                                  title: Text(
-                                      '${widget.requestCategory} @ ${widget.requestLocation}'),
-                                  subtitle: Text(widget.requestDescription),
-                                  trailing: Text(
-                                    'S\$${widget.requestCompensation}',
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                ),
-                                ButtonBar(
-                                  children: <Widget>[
-                                    Visibility(
-                                      visible: _isNegoButtonVisible,
-                                      child: FlatButton(
-                                        child: const Text('NEGOTIATE'),
-                                        onPressed: () {/* ... */},
-                                      ),
-                                    ),
-                                    Visibility(
-                                      visible: _isWorkDoneButtonVisible,
-                                      child: MaterialButton(
-                                        color: Colors.green,
-                                        child: const Text('CONFIRM WORK DONE'),
-                                        onPressed: () async {
-                                          await chat.updateWorkDoneStatus(
-                                              groupChatId);
-                                        },
-                                      ),
-                                    ),
-                                    Visibility(
-                                      visible: _isAcceptButtonVisible,
-                                      child: MaterialButton(
-                                        color: Colors.green,
-                                        child: const Text('ACCEPT'),
-                                        onPressed: () async {
-                                          await req.updateRequestStatus(
-                                              widget.docId);
-                                          await chat
-                                              .updateJobStatus(groupChatId);
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            );
                           }
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              ListTile(
+                                // leading: Chip(
+                                //   label: Text(roomData['jobStatus'] ),
+                                // ),
+                                title: Text(
+                                    '${widget.requestCategory} @ ${widget.requestLocation}'),
+                                subtitle: Text(widget.requestDescription),
+                                trailing: Text(
+                                  'S\$${widget.requestCompensation}',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                              ButtonBar(
+                                children: <Widget>[
+                                  Visibility(
+                                    visible: _isNegoButtonVisible,
+                                    child: FlatButton(
+                                      child: const Text('NEGOTIATE'),
+                                      onPressed: () {/* ... */},
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: _isWorkDoneButtonVisible,
+                                    child: MaterialButton(
+                                      color: Colors.green,
+                                      child: const Text('CONFIRM WORK DONE'),
+                                      onPressed: () async {
+                                        await chat
+                                            .updateWorkDoneStatus(groupChatId);
+                                      },
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: _isAcceptButtonVisible,
+                                    child: MaterialButton(
+                                      color: Colors.green,
+                                      child: const Text('ACCEPT'),
+                                      onPressed: () async {
+                                        await req
+                                            .updateRequestStatus(widget.docId);
+                                        await chat.updateJobStatus(groupChatId);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          );
                         }),
               ),
             ),
             buildListMessage(),
             buildInput(),
-            // buildLoading()
           ],
         ),
       ),

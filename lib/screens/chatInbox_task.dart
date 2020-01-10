@@ -593,7 +593,10 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               ListTile(
-                                // leading: Icon(Icons.thumbs_up_down, size: 32,),
+                                leading: Chip(
+                          
+                                  label: Text(roomData['jobStatus']),
+                                ),
                                 title: Text(
                                     '${widget.requestCategory} @ ${widget.requestLocation}'),
                                 subtitle: Text(widget.requestDescription),
