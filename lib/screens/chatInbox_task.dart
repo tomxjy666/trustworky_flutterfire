@@ -580,6 +580,9 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                                         Colors.green)));
                           } else {
                             roomData = snapshot.data;
+                            if(roomData['jobStatus'] == null) {
+                              roomData['jobStatus'] = 'open';
+                            }
                             if (roomData['jobStatus'] == 'pending') {
                               _isAcceptButtonVisible = false;
                               _isNegoButtonVisible = false;

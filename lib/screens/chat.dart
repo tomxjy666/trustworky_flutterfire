@@ -57,6 +57,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   var listMessage;
   var roomData;
+  // var jobStatus;
   String groupChatId;
   SharedPreferences prefs;
 
@@ -570,6 +571,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                         Colors.green)));
                           } else {
                             roomData = snapshot.data;
+                            if(roomData['jobStatus'] == null) {
+                              roomData['jobStatus'] = 'open';
+                            }
                             if (roomData['jobStatus'] == 'pending') {
                               _isAcceptButtonVisible = false;
                               _isNegoButtonVisible = false;
@@ -579,13 +583,14 @@ class _ChatScreenState extends State<ChatScreen> {
                               _isWorkDoneButtonVisible = false;
                             }
                           }
+
                           return Column(
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               ListTile(
-                                // leading: Chip(
-                                //   label: Text(roomData['jobStatus'] ),
-                                // ),
+                                 leading: Chip(
+                                   label: Text(roomData['jobStatus'] ),
+                                 ),
                                 title: Text(
                                     '${widget.requestCategory} @ ${widget.requestLocation}'),
                                 subtitle: Text(widget.requestDescription),

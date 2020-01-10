@@ -532,6 +532,9 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                         Colors.green)));
                           } else {
                             roomData = snapshot.data;
+                            if(roomData['jobStatus'] == null) {
+                              roomData['jobStatus'] = 'open';
+                            }
                             if (roomData['jobStatus'] == 'workDone' ) {
                               _isConfirmWorkDoneButtonVisible = true;
                             }
