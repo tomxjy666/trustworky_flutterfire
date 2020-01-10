@@ -32,6 +32,9 @@ class Question {
 class Room {
   String requestDocId;
   String requester;
+  String requestCategory;
+  String requesterDisplayName;
+  String requesterPhotoUrl;
   String serviceProvider;
   String serviceProviderPhotoUrl;
   String serviceProviderDisplayName;
@@ -40,6 +43,9 @@ class Room {
   Room({
     this.requestDocId,
     this.requester,
+    this.requestCategory,
+    this.requesterDisplayName,
+    this.requesterPhotoUrl,
     this.serviceProvider,
     this.serviceProviderPhotoUrl,
     this.serviceProviderDisplayName

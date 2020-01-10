@@ -12,9 +12,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:trustworky_flutterfire/shared/shared.dart';
 
-class ChatScreen extends StatefulWidget {
+class ChatInboxTaskScreen extends StatefulWidget {
+  final String serviceProviderDisplayName;
+  final String serviceProviderPhotoUrl;
+  final String serviceProvider;
   final String docId;
-  final String requestId;
+  // final String requestId;
   final String requestCategory;
   final String requestCompensation;
   final String requestLocation;
@@ -23,11 +26,16 @@ class ChatScreen extends StatefulWidget {
   final String requesterAvatar;
   final String requesterDisplayName;
   final String requesterEmail;
+  final String requester;
+  final String requesterPhotoUrl;
 
-  ChatScreen(
+  ChatInboxTaskScreen(
       {Key key,
+      @required this.serviceProviderDisplayName,
+      @required this.serviceProviderPhotoUrl,
+      @required this.serviceProvider,
       @required this.docId,
-      @required this.requestId,
+      // @required this.requestId,
       @required this.requestCategory,
       @required this.requestCompensation,
       @required this.requestLocation,
@@ -35,14 +43,17 @@ class ChatScreen extends StatefulWidget {
       @required this.requesterUid,
       @required this.requesterDisplayName,
       @required this.requesterAvatar,
-      @required this.requesterEmail})
+      @required this.requesterEmail,
+      @required this.requester,
+      @required this.requesterPhotoUrl
+      })
       : super(key: key);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  _ChatInboxTaskScreenState createState() => _ChatInboxTaskScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
   bool _isVisible = true;
   String uid;
   String email;
@@ -60,13 +71,15 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController listScrollController = new ScrollController();
 
   readLocal() async {
+    print('@@@@@@@@@@@@');
+    print(widget.serviceProviderPhotoUrl);
     prefs = await SharedPreferences.getInstance();
     // get currentUser unique id
     uid = prefs.getString('id') ?? '';
     // get currentUser unique email
-    email = prefs.getString('email') ?? '';
+    // email = prefs.getString('email') ?? '';
     // set groupchatId = request docs id + unique email of serviceProvider
-    groupChatId = '${widget.docId}-$email';
+    groupChatId = '${widget.docId}-${widget.serviceProvider}';
     // Firestore.instance.collection('users').document(uid).updateData({'chattingWith': peerId});
     setState(() {});
   }
@@ -363,7 +376,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             height: 35.0,
                             padding: EdgeInsets.all(10.0),
                           ),
-                          imageUrl: widget.requesterAvatar,
+                          imageUrl: widget.requesterPhotoUrl,
                           width: 35.0,
                           height: 35.0,
                           fit: BoxFit.cover,
@@ -468,7 +481,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: ChatBar(
         color: Colors.green,
-        profilePic: widget.requesterAvatar,
+        profilePic: widget.requesterPhotoUrl,
         username: widget.requesterDisplayName,
         lastseen: '',
         status: ChatBarState.LASTSEEN,

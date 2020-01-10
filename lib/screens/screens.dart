@@ -14,6 +14,7 @@ export 'inbox_request_list.dart';
 export 'task_tile.dart';
 export 'chat.dart';
 export 'chatInbox.dart';
+export 'chatInbox_task.dart';
 export 'inbox_task.dart';
 export 'inbox_task_list.dart';
 export 'inbox_task_tile.dart';

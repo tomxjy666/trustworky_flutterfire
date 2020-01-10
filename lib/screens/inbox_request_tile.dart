@@ -46,8 +46,8 @@ class _InboxRequestTileState extends State<InboxRequestTile> {
                 backgroundImage: NetworkImage(widget.room.serviceProviderPhotoUrl),
                 backgroundColor: Colors.transparent,
               ),
-              title: Text(widget.room.serviceProvider),
-              subtitle: Text(widget.room.serviceProviderDisplayName),
+              title: Text(widget.room.serviceProviderDisplayName),
+              subtitle: Text(widget.room.requestCategory),
               // trailing: Text(request.location),
               onTap: () {
                 Navigator.push(

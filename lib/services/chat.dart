@@ -24,7 +24,10 @@ class ChatService {
     return snapshot.documents.map((doc) {
       return Room(
           requestDocId: doc.data['requestDocId'] ?? '',
+          requestCategory: doc.data['requestCategory'] ?? '',
           requester: doc.data['requester'] ?? '',
+          requesterDisplayName: doc.data['requesterDisplayName'] ?? '',
+          requesterPhotoUrl: doc.data['requesterPhotoUrl'] ?? '',
           serviceProvider: doc.data['serviceProvider'] ?? '',
           serviceProviderDisplayName: doc.data['serviceProviderDisplayName'] ?? '',
           serviceProviderPhotoUrl: doc.data['serviceProviderPhotoUrl'] ?? '');

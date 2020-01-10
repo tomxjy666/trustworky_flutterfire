@@ -75,7 +75,10 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   'serviceProviderDisplayName': user.displayName,
                   'serviceProviderPhotoUrl': user.photoUrl,
                   'requester': widget.request.requesterEmail,
-                  'requestDocId': widget.request.docId
+                  'requesterDisplayName': widget.request.requesterDisplayName,
+                  'requesterPhotoUrl': widget.request.requesterPhotoUrl,
+                  'requestDocId': widget.request.docId,
+                  'requestCategory': widget.request.category
                   // 'created': DateTime.now().millisecondsSinceEpoch.toString()
                 },
               );

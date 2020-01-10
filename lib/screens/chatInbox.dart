@@ -284,11 +284,11 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
               ? Container(
                   child: Text(
                     document['content'],
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.white),
                   ),
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                  width: 200.0,
-                  decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(8.0)),
+                  // width: 200.0,
+                  decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(8.0)),
                   margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
                 )
               : document['type'] == 1
@@ -386,11 +386,11 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                     ? Container(
                         child: Text(
                           document['content'],
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.black),
                         ),
                         padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                        width: 200.0,
-                        decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(8.0)),
+                        // width: 200.0,
+                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(8.0)),
                         margin: EdgeInsets.only(left: 10.0),
                       )
                     : document['type'] == 1

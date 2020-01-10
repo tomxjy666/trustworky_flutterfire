@@ -43,22 +43,25 @@ class _InboxTaskTileState extends State<InboxTaskTile> {
                   child: ListTile(
               leading: CircleAvatar(
                 radius: 20.0,
-                backgroundImage: NetworkImage(widget.room.serviceProviderPhotoUrl),
+                backgroundImage: NetworkImage(widget.room.requesterPhotoUrl),
                 backgroundColor: Colors.transparent,
               ),
-              title: Text(widget.room.serviceProvider),
-              subtitle: Text(widget.room.serviceProviderDisplayName),
+              title: Text(widget.room.requesterDisplayName),
+              subtitle: Text(widget.room.requestCategory),
               // trailing: Text(request.location),
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChatInboxScreen(
+                    builder: (context) => ChatInboxTaskScreen(
+                        requester: widget.room.requester,
+                        // requesterDisplayName: widget.room.requesterDisplayName,
+                        requesterPhotoUrl: widget.room.requesterPhotoUrl,
                         serviceProviderPhotoUrl: widget.room.serviceProviderPhotoUrl,
                         serviceProviderDisplayName: widget.room.serviceProviderDisplayName,
                         serviceProvider: widget.room.serviceProvider,
                         docId: widget.room.requestDocId,
-                        requestId: requestData['id'],
+                        // requestId: requestData['id'],
                         requestCategory: requestData['category'],
                         requestCompensation: requestData['compensation'],
                         requestDescription: requestData['description'],
