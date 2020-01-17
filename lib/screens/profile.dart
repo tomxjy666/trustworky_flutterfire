@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/services.dart';
+import '../screens/screens.dart';
 import '../shared/shared.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,7 @@ class ProfileScreen extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.white,
           title: Text(user.displayName ?? 'Guest', style: TextStyle(fontFamily: 'ProductSans', color: Colors.black,),),
+        
         ),
         body: Center(
           child: Column(
@@ -39,6 +41,19 @@ class ProfileScreen extends StatelessWidget {
                 ),
               Text(user.email ?? '',
                   style: Theme.of(context).textTheme.title),
+                  OutlineButton(
+                  child: Text(
+                    'SEE REVIEWS',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  // color: Colors.redAccent[400],
+                  onPressed: ()  {
+                    Navigator.push(context, MaterialPageRoute( builder: (context) => ReviewScreen(
+                      userUid: user.uid
+                    )));
+                  
+                  }
+                  ),
               Spacer(),
               // if (report != null)
                 //  Text(activity,
