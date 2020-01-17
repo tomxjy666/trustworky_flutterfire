@@ -647,6 +647,11 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                               _isAcceptButtonVisible = true;
                               _isNegoButtonVisible = true;
                             }
+                            if (roomData['jobStatus'] == 'paid') {
+                              _isAcceptButtonVisible = false;
+                              _isNegoButtonVisible = false;
+                              // _isWorkDoneButtonVisible = true;
+                            }
                           }
                           return Column(
                             mainAxisSize: MainAxisSize.min,

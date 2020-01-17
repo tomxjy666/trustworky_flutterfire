@@ -24,54 +24,72 @@ class _InboxRequestTileState extends State<InboxRequestTile> {
     // String profilePicture =
     //     room.serviceProviderPhotoUrl.replaceAll('s96-c', 's400-c');
     var requestData;
-    var documentReference =
-        Firestore.instance.collection('requests').document(widget.room.requestDocId);
-    Firestore.instance.runTransaction((transaction) async {
-      print('CALLED@@@@@@@@@@@@@@@@@@');
-      await transaction.get(documentReference).then((result) {
-        print(result.data.toString());
-        requestData = result.data;
-      });
-    });
+    // var documentReference =
+    //     Firestore.instance.collection('requests').document(widget.room.requestDocId);
+    // Firestore.instance.runTransaction((transaction) async {
+    //   print('CALLED@@@@@@@@@@@@@@@@@@');
+    //   await transaction.get(documentReference).then((result) {
+    //     print(result.data.toString());
+    //     requestData = result.data;
+    //   });
+    // });
 
     return Padding(
       padding: EdgeInsets.only(top: 0.2),
-      child: Card(
-        // margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0),
-        child: Visibility(
-          visible: _isVisible,
-                  child: ListTile(
-              leading: CircleAvatar(
-                radius: 20.0,
-                backgroundImage: NetworkImage(widget.room.serviceProviderPhotoUrl),
-                backgroundColor: Colors.transparent,
+      child: StreamBuilder(
+          stream: Firestore.instance
+              .collection('requests')
+              .document(widget.room.requestDocId)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                  child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green)));
+            } else {
+              requestData = snapshot.data;
+            }
+            return Card(
+              // margin: EdgeInsets.fromLTRB(20.0, 6.0, 20.0, 0),
+              child: Visibility(
+                visible: _isVisible,
+                child: ListTile(
+                    leading: CircleAvatar(
+                      radius: 20.0,
+                      backgroundImage:
+                          NetworkImage(widget.room.serviceProviderPhotoUrl),
+                      backgroundColor: Colors.transparent,
+                    ),
+                    title: Text(widget.room.serviceProviderDisplayName),
+                    subtitle: Text(widget.room.requestCategory),
+                    // trailing: Text(request.location),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ChatInboxScreen(
+                              serviceProviderPhotoUrl:
+                                  widget.room.serviceProviderPhotoUrl,
+                              serviceProviderDisplayName:
+                                  widget.room.serviceProviderDisplayName,
+                              serviceProvider: widget.room.serviceProvider,
+                              docId: widget.room.requestDocId,
+                              requestId: requestData['id'],
+                              requestCategory: requestData['category'],
+                              requestCompensation: requestData['compensation'],
+                              requestDescription: requestData['description'],
+                              requestLocation: requestData['location'],
+                              requesterUid: requestData['requesterUid'],
+                              requesterDisplayName:
+                                  requestData['requesterDisplayName'],
+                              requesterAvatar: requestData['requesterPhotoUrl'],
+                              requesterEmail: requestData['requesterEmail']),
+                        ),
+                      );
+                    }),
               ),
-              title: Text(widget.room.serviceProviderDisplayName),
-              subtitle: Text(widget.room.requestCategory),
-              // trailing: Text(request.location),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatInboxScreen(
-                        serviceProviderPhotoUrl: widget.room.serviceProviderPhotoUrl,
-                        serviceProviderDisplayName: widget.room.serviceProviderDisplayName,
-                        serviceProvider: widget.room.serviceProvider,
-                        docId: widget.room.requestDocId,
-                        requestId: requestData['id'],
-                        requestCategory: requestData['category'],
-                        requestCompensation: requestData['compensation'],
-                        requestDescription: requestData['description'],
-                        requestLocation: requestData['location'],
-                        requesterUid: requestData['requesterUid'],
-                        requesterDisplayName: requestData['requesterDisplayName'],
-                        requesterAvatar: requestData['requesterPhotoUrl'],
-                        requesterEmail: requestData['requesterEmail']),
-                  ),
-                );
-              }),
-        ),
-      ),
+            );
+          }),
     );
   }
 }
