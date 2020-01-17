@@ -50,10 +50,11 @@ class ChatInboxScreen extends StatefulWidget {
 }
 
 class _ChatInboxScreenState extends State<ChatInboxScreen> {
+  RequestService req = RequestService();
   ChatService chat = ChatService();
   bool _isVisible = true;
-  bool _isAcceptButtonVisible = false;
-  bool _isNegoButtonVisible = false;
+  bool _isAcceptOfferButtonVisible = false;
+  bool _isDeclineOfferButtonVisible = false;
   bool _isConfirmWorkDoneButtonVisible = false;
   String uid;
   String email;
@@ -69,7 +70,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
   // bool isShowSticker;
   String imageUrl;
 
-  final TextEditingController textEditingController = new TextEditingController();
+  final TextEditingController textEditingController =
+      new TextEditingController();
   final ScrollController listScrollController = new ScrollController();
 
   readLocal() async {
@@ -138,7 +140,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
           },
         );
       });
-      listScrollController.animateTo(0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+      listScrollController.animateTo(0.0,
+          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     } else {
       Fluttertoast.showToast(msg: 'Nothing to send');
       print('nothing to send');
@@ -158,7 +161,10 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
   }
 
   bool isLastMessageLeft(int index) {
-    if ((index > 0 && listMessage != null && listMessage[index - 1]['idFrom'] == uid) || index == 0) {
+    if ((index > 0 &&
+            listMessage != null &&
+            listMessage[index - 1]['idFrom'] == uid) ||
+        index == 0) {
       return true;
     } else {
       return false;
@@ -166,7 +172,10 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
   }
 
   bool isLastMessageRight(int index) {
-    if ((index > 0 && listMessage != null && listMessage[index - 1]['idFrom'] != uid) || index == 0) {
+    if ((index > 0 &&
+            listMessage != null &&
+            listMessage[index - 1]['idFrom'] != uid) ||
+        index == 0) {
       return true;
     } else {
       return false;
@@ -178,7 +187,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
       child: isLoading
           ? Container(
               child: Center(
-                child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.green)),
+                child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green)),
               ),
               color: Colors.white.withOpacity(0.8),
             )
@@ -218,7 +228,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
           Flexible(
             child: Container(
               child: TextField(
-                style: TextStyle(color: Colors.green, fontSize: 15.0),
+                style: TextStyle(color: Colors.black, fontSize: 15.0),
                 controller: textEditingController,
                 decoration: InputDecoration.collapsed(
                   hintText: 'Type your message...',
@@ -246,14 +256,18 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
       width: double.infinity,
       height: 50.0,
       decoration: new BoxDecoration(
-          border: new Border(top: new BorderSide(color: Colors.grey, width: 0.5)), color: Colors.white),
+          border:
+              new Border(top: new BorderSide(color: Colors.grey, width: 0.5)),
+          color: Colors.white),
     );
   }
 
   Widget buildListMessage() {
     return Flexible(
       child: groupChatId == ''
-          ? Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.green)))
+          ? Center(
+              child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.green)))
           : StreamBuilder(
               stream: Firestore.instance
                   .collection('rooms')
@@ -265,12 +279,15 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
-                      child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.green)));
+                      child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.green)));
                 } else {
                   listMessage = snapshot.data.documents;
                   return ListView.builder(
                     padding: EdgeInsets.all(10.0),
-                    itemBuilder: (context, index) => buildItem(index, snapshot.data.documents[index]),
+                    itemBuilder: (context, index) =>
+                        buildItem(index, snapshot.data.documents[index]),
                     itemCount: snapshot.data.documents.length,
                     reverse: true,
                     controller: listScrollController,
@@ -295,8 +312,12 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                   ),
                   padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                   // width: 200.0,
-                  decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(8.0)),
-                  margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+                  decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(8.0)),
+                  margin: EdgeInsets.only(
+                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                      right: 10.0),
                 )
               : document['type'] == 1
                   // Image
@@ -306,7 +327,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                           child: CachedNetworkImage(
                             placeholder: (context, url) => Container(
                               child: CircularProgressIndicator(
-                                valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.green),
                               ),
                               width: 200.0,
                               height: 200.0,
@@ -340,22 +362,45 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                         ),
                         onPressed: () {
                           Navigator.push(
-                              context, MaterialPageRoute(builder: (context) => FullPhoto(url: document['content'])));
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      FullPhoto(url: document['content'])));
                         },
                         padding: EdgeInsets.all(0),
                       ),
-                      margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+                      margin: EdgeInsets.only(
+                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                          right: 10.0),
                     )
-                  // Sticker
-                  : Container(
-                      child: new Image.asset(
-                        'images/${document['content']}.gif',
-                        width: 100.0,
-                        height: 100.0,
-                        fit: BoxFit.cover,
-                      ),
-                      margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
-                    ),
+                  : document['type'] == 2
+                      // Offer
+                      ? Container(
+                          child: Text(
+                            document['content'],
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600),
+                          ),
+                          padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                          // width: 200.0,
+                          decoration: BoxDecoration(
+                              color: Color.fromRGBO(212, 234, 244, 1.0),
+                              borderRadius: BorderRadius.circular(8.0)),
+                          margin: EdgeInsets.only(left: 10.0),
+                        )
+                      // Sticker
+                      : Container(
+                          child: new Image.asset(
+                            'images/${document['content']}.gif',
+                            width: 100.0,
+                            height: 100.0,
+                            fit: BoxFit.cover,
+                          ),
+                          margin: EdgeInsets.only(
+                              bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                              right: 10.0),
+                        ),
         ],
         mainAxisAlignment: MainAxisAlignment.end,
       );
@@ -372,7 +417,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                           placeholder: (context, url) => Container(
                             child: CircularProgressIndicator(
                               strokeWidth: 1.0,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.green),
                             ),
                             width: 35.0,
                             height: 35.0,
@@ -397,7 +443,9 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                         ),
                         padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                         // width: 200.0,
-                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(8.0)),
+                        decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(8.0)),
                         margin: EdgeInsets.only(left: 10.0),
                       )
                     : document['type'] == 1
@@ -407,7 +455,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                 child: CachedNetworkImage(
                                   placeholder: (context, url) => Container(
                                     child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.green),
                                     ),
                                     width: 200.0,
                                     height: 200.0,
@@ -419,7 +468,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                       ),
                                     ),
                                   ),
-                                  errorWidget: (context, url, error) => Material(
+                                  errorWidget: (context, url, error) =>
+                                      Material(
                                     child: Image.asset(
                                       'images/img_not_available.jpeg',
                                       width: 200.0,
@@ -436,26 +486,50 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                   height: 200.0,
                                   fit: BoxFit.cover,
                                 ),
-                                borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(8.0)),
                                 clipBehavior: Clip.hardEdge,
                               ),
                               onPressed: () {
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => FullPhoto(url: document['content'])));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => FullPhoto(
+                                            url: document['content'])));
                               },
                               padding: EdgeInsets.all(0),
                             ),
                             margin: EdgeInsets.only(left: 10.0),
                           )
-                        : Container(
-                            child: new Image.asset(
-                              'images/${document['content']}.gif',
-                              width: 100.0,
-                              height: 100.0,
-                              fit: BoxFit.cover,
-                            ),
-                            margin: EdgeInsets.only(bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
-                          ),
+                        : document['type'] == 2
+                            // Offer
+                            ? Container(
+                                child: Text(
+                                  document['content'],
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                padding:
+                                    EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                                // width: 200.0,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(212, 234, 244, 1.0),
+                                    borderRadius: BorderRadius.circular(8.0)),
+                                margin: EdgeInsets.only(left: 10.0),
+                              )
+                            : Container(
+                                child: new Image.asset(
+                                  'images/${document['content']}.gif',
+                                  width: 100.0,
+                                  height: 100.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                margin: EdgeInsets.only(
+                                    bottom:
+                                        isLastMessageRight(index) ? 20.0 : 10.0,
+                                    right: 10.0),
+                              ),
               ],
             ),
 
@@ -463,9 +537,13 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
             isLastMessageLeft(index)
                 ? Container(
                     child: Text(
-                      DateFormat('dd MMM kk:mm')
-                          .format(DateTime.fromMillisecondsSinceEpoch(int.parse(document['timestamp']))),
-                      style: TextStyle(color: Colors.grey, fontSize: 12.0, fontStyle: FontStyle.italic),
+                      DateFormat('dd MMM kk:mm').format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                              int.parse(document['timestamp']))),
+                      style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12.0,
+                          fontStyle: FontStyle.italic),
                     ),
                     margin: EdgeInsets.only(left: 50.0, top: 5.0, bottom: 5.0),
                   )
@@ -521,82 +599,245 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                             valueColor:
                                 AlwaysStoppedAnimation<Color>(Colors.green)))
                     : StreamBuilder(
-                  stream: Firestore.instance
+                        stream: Firestore.instance
                             .collection('rooms')
                             .document(groupChatId)
                             .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
                             return Center(
                                 child: CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
                                         Colors.green)));
                           } else {
                             roomData = snapshot.data;
-                        
-                            if (roomData['jobStatus'] == 'workDone' ) {
-                              _isConfirmWorkDoneButtonVisible = true;
-                            }
-                            if (roomData['jobStatus'] == 'paid' ) {
-                              _isConfirmWorkDoneButtonVisible = false;
-                            }
-                            if(roomData['jobStatus'] == null) {
+
+                            if (roomData['jobStatus'] == null) {
                               jobStatus = 'open';
-                            }else {
+                            } else {
                               jobStatus = roomData['jobStatus'];
                             }
+
+                            if (roomData['jobStatus'] == 'workDone') {
+                              _isConfirmWorkDoneButtonVisible = true;
+                            }
+                            if (roomData['jobStatus'] == 'paid') {
+                              _isConfirmWorkDoneButtonVisible = false;
+                            }
+                            if (roomData['jobStatus'] == 'negotiating') {
+                              _isDeclineOfferButtonVisible = true;
+                              _isAcceptOfferButtonVisible = true;
+                            }
+                            if (roomData['jobStatus'] == 'pending') {
+                              _isDeclineOfferButtonVisible = false;
+                              _isAcceptOfferButtonVisible = false;
+                            }
+                            if (roomData['jobStatus'] == 'open') {
+                              _isDeclineOfferButtonVisible = false;
+                              _isAcceptOfferButtonVisible = false;
+                            }
                           }
-                            
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        ListTile(
-                          leading: Chip(
-                                    // avatar: CircleAvatar(
-                                    //   backgroundColor: Colors.grey[300],
-            
-                                    // ),
-                                    label: Text(jobStatus),
+
+                          return Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              ListTile(
+                                leading: Chip(
+                                  // avatar: CircleAvatar(
+                                  //   backgroundColor: Colors.grey[300],
+
+                                  // ),
+                                  label: Text(jobStatus),
+                                ),
+                                title: Text(
+                                    '${widget.requestCategory} @ ${widget.requestLocation}'),
+                                subtitle: Text(widget.requestDescription),
+                                trailing: Text(
+                                  'S\$${widget.requestCompensation}',
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                              ButtonBar(
+                                children: <Widget>[
+                                  Visibility(
+                                    visible: _isDeclineOfferButtonVisible,
+                                    child: FlatButton(
+                                      child: const Text('DECLINE OFFER'),
+                                      onPressed: () {
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return AlertDialog(
+                                              title: Text('Confirm Decline Offer'),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  onPressed: () {
+                                                     Navigator.of(context,
+                                                              rootNavigator:
+                                                                  true)
+                                                          .pop(true);
+
+                                                  },
+                                                  child: Text('CANCEL'),
+                                                ),
+                                                FlatButton(
+                                                  onPressed: () async {
+                                                    final String decline = "DECLINED OFFER: S\$";
+
+var documentReference = Firestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'rooms')
+                                                                    .document(
+                                                                        groupChatId)
+                                                                    .collection(
+                                                                        'messages')
+                                                                    .document(DateTime
+                                                                            .now()
+                                                                        .millisecondsSinceEpoch
+                                                                        .toString());
+
+                                                                Firestore
+                                                                    .instance
+                                                                    .runTransaction(
+                                                                        (transaction) async {
+                                                                  await transaction
+                                                                      .set(
+                                                                    documentReference,
+                                                                    {
+                                                                      'idFrom':
+                                                                          uid,
+                                                                      'idTo': widget
+                                                                          .requesterUid,
+                                                                      'timestamp': DateTime
+                                                                              .now()
+                                                                          .millisecondsSinceEpoch
+                                                                          .toString(),
+                                                                      'content': decline
+                                                                          + roomData['negoPrice'],
+                                                                      'type': 2
+                                                                    },
+                                                                  );
+                                                                });
+
+
+                                                      
+                                                        await chat
+                                                                    .declineOffer(
+                                                                        groupChatId);
+                                                        Navigator.of(context,
+                                                                rootNavigator:
+                                                                    true)
+                                                            .pop(true);
+
+                                                  },
+                                                  child: Text('DECLINE OFFER'),
+                                                )
+                                              ],
+                                            );
+
+                                          }
+                                        );
+                                      },
+                                    ),
                                   ),
-                          title: Text(
-                              '${widget.requestCategory} @ ${widget.requestLocation}'),
-                          subtitle: Text(widget.requestDescription),
-                          trailing: Text(
-                            'S\$${widget.requestCompensation}',
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ),
-                        ButtonBar(
-                          children: <Widget>[
-                            Visibility(
-                              visible: _isNegoButtonVisible,
-                                                          child: FlatButton(
-                                child: const Text('NEGOTIATE'),
-                                onPressed: () {/* ... */},
+                                  Visibility(
+                                    visible: _isAcceptOfferButtonVisible,
+                                    child: MaterialButton(
+                                      color: Colors.green,
+                                      child: const Text('ACCEPT OFFER'),
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                    'Confirm Accept Offer?'),
+                                                content: Text('Once you accept the Service Provider\'s offer, you\'ll be able to leave a review for each other.' ),    
+                                                actions: <Widget>[
+                                                  FlatButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context,
+                                                              rootNavigator:
+                                                                  true)
+                                                          .pop(true);
+                                                    },
+                                                    child: Text('CANCEL'),
+                                                  ),
+                                                  FlatButton(
+                                                      onPressed: () async {
+                                                        final String accept = "ACCEPTED OFFER: S\$";
+
+var documentReference = Firestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'rooms')
+                                                                    .document(
+                                                                        groupChatId)
+                                                                    .collection(
+                                                                        'messages')
+                                                                    .document(DateTime
+                                                                            .now()
+                                                                        .millisecondsSinceEpoch
+                                                                        .toString());
+
+                                                                Firestore
+                                                                    .instance
+                                                                    .runTransaction(
+                                                                        (transaction) async {
+                                                                  await transaction
+                                                                      .set(
+                                                                    documentReference,
+                                                                    {
+                                                                      'idFrom':
+                                                                          uid,
+                                                                      'idTo': widget
+                                                                          .requesterUid,
+                                                                      'timestamp': DateTime
+                                                                              .now()
+                                                                          .millisecondsSinceEpoch
+                                                                          .toString(),
+                                                                      'content': accept
+                                                                          + roomData['negoPrice'],
+                                                                      'type': 2
+                                                                    },
+                                                                  );
+                                                                });
+
+
+                                                        await req
+                                            .updateRequestStatus(widget.docId);
+                                                        await chat
+                                                                    .acceptOffer(
+                                                                        groupChatId, roomData['negoPrice']);
+                                                        Navigator.of(context,
+                                                                rootNavigator:
+                                                                    true)
+                                                            .pop(true);
+                                                      },
+                                                      child:
+                                                          Text('ACCEPT OFFER'))
+                                                ],
+                                              );
+                                            });
+                                      },
+                                    ),
+                                  ),
+                                  Visibility(
+                                    visible: _isConfirmWorkDoneButtonVisible,
+                                    child: FlatButton(
+                                      child: const Text('CONFIRM WORK DONE'),
+                                      onPressed: () async {
+                                        await chat
+                                            .confirmWorkDoneStatus(groupChatId);
+                                      },
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            Visibility(
-                              visible: _isAcceptButtonVisible,
-                                                          child: MaterialButton(
-                                color: Colors.green,
-                                child: const Text('ACCEPT'),
-                                onPressed: () {/* ... */},
-                              ),
-                            ),
-                            Visibility(
-                              visible: _isConfirmWorkDoneButtonVisible,
-                                                          child: FlatButton(
-                                child: const Text('CONFIRM WORK DONE'),
-                                onPressed: () async {await chat
-                                              .confirmWorkDoneStatus(groupChatId);},
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }
-                ),
+                            ],
+                          );
+                        }),
               ),
             ),
             buildListMessage(),

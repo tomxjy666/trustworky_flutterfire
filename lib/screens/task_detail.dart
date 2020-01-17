@@ -67,8 +67,13 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
             var documentReference =
                 Firestore.instance.collection('rooms').document(groupChatId);
 
-            Firestore.instance.runTransaction((transaction) async {
-              await transaction.set(
+            Firestore.instance.runTransaction((Transaction transaction) async {
+
+              DocumentSnapshot roomSnapshot = await transaction.get(documentReference);
+              if(roomSnapshot.exists) {
+                print('Room Exists');
+              } else {
+                await transaction.set(
                 documentReference,
                 {
                   'serviceProvider': email,
@@ -83,6 +88,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   // 'created': DateTime.now().millisecondsSinceEpoch.toString()
                 },
               );
+              }
+              
             });
             Navigator.push(
                 context,

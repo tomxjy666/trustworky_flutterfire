@@ -21,11 +21,12 @@ class ChatService {
       Firestore.instance.collection('rooms');
 
   //update job status pending
-  Future updateJobStatus(String roomId) {
+  Future acceptListedRate(String roomId, String finalisedCompensation) {
     DocumentReference requestRef = _db.collection('rooms').document(roomId);
 
     return requestRef.updateData({
       'jobStatus': 'pending',
+      'finalisedCompensation': finalisedCompensation,
       'lastUpdated': DateTime.now()
     });
   }
@@ -48,7 +49,49 @@ class ChatService {
       'jobStatus': 'paid',
       'lastUpdated': DateTime.now()
     });
-  } 
+  }
+
+  //update job price negotiation
+  Future negotiatePrice(String roomId, String price, String email) {
+    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+
+    return requestRef.updateData({
+      'negoPrice': price,
+      'negoUser': email,
+      'lastUpdated': DateTime.now()
+    });
+  }
+
+  //update job status negotiating
+  Future updateNegoStatus(String roomId) {
+    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+
+    return requestRef.updateData({
+      'jobStatus': 'negotiating',
+      'lastUpdated': DateTime.now()
+    });
+  }
+
+  //accept counter offer
+  Future acceptOffer(String roomId, String finalisedCompensation) {
+    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+
+    return requestRef.updateData({
+      'jobStatus': 'pending',
+      'finalisedCompensation': finalisedCompensation,
+      'lastUpdated': DateTime.now()
+    });
+  }
+
+  //decline counter offer
+  Future declineOffer(String roomId) {
+    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+
+    return requestRef.updateData({
+      'jobStatus': 'open',
+      'lastUpdated': DateTime.now()
+    });
+  }
 
   // room list from snapshot
   List<Room> _roomListFromSnapshot(QuerySnapshot snapshot) {

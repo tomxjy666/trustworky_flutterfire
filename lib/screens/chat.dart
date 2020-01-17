@@ -44,6 +44,8 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
   RequestService req = RequestService();
   ChatService chat = ChatService();
   bool _isVisible = true;
@@ -54,8 +56,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
   String uid;
   String email;
+  String error = '';
+  String negoPrice = '';
 
   var listMessage;
+  var listedPrice;
   var roomData;
   var jobStatus;
   String groupChatId;
@@ -222,7 +227,7 @@ class _ChatScreenState extends State<ChatScreen> {
           Flexible(
             child: Container(
               child: TextField(
-                style: TextStyle(color: Colors.green, fontSize: 15.0),
+                style: TextStyle(color: Colors.black, fontSize: 15.0),
                 controller: textEditingController,
                 decoration: InputDecoration.collapsed(
                   hintText: 'Type your message...',
@@ -367,18 +372,38 @@ class _ChatScreenState extends State<ChatScreen> {
                           bottom: isLastMessageRight(index) ? 20.0 : 10.0,
                           right: 10.0),
                     )
-                  // Sticker
-                  : Container(
-                      child: new Image.asset(
-                        'images/${document['content']}.gif',
-                        width: 100.0,
-                        height: 100.0,
-                        fit: BoxFit.cover,
-                      ),
-                      margin: EdgeInsets.only(
-                          bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                          right: 10.0),
-                    ),
+                  : document['type'] == 2
+                      // Offer
+                      ? Container(
+                          alignment: Alignment.center,
+                          child: Text(
+                            document['content'],
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600),
+                          ),
+                          padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                          // width: 200.0,
+                          decoration: BoxDecoration(
+                              color: Color.fromRGBO(212, 234, 244, 1.0),
+                              // color: Colors.green,
+                              borderRadius: BorderRadius.circular(8.0)),
+                          margin: EdgeInsets.only(
+                              bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                              right: 10.0),
+                        )
+                      // Sticker
+                      : Container(
+                          child: new Image.asset(
+                            'images/${document['content']}.gif',
+                            width: 100.0,
+                            height: 100.0,
+                            fit: BoxFit.cover,
+                          ),
+                          margin: EdgeInsets.only(
+                              bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                              right: 10.0),
+                        ),
         ],
         mainAxisAlignment: MainAxisAlignment.end,
       );
@@ -479,17 +504,35 @@ class _ChatScreenState extends State<ChatScreen> {
                             ),
                             margin: EdgeInsets.only(left: 10.0),
                           )
-                        : Container(
-                            child: new Image.asset(
-                              'images/${document['content']}.gif',
-                              width: 100.0,
-                              height: 100.0,
-                              fit: BoxFit.cover,
-                            ),
-                            margin: EdgeInsets.only(
-                                bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                                right: 10.0),
-                          ),
+                        : document['type'] == 2
+                            // Offer
+                            ? Container(
+                                child: Text(
+                                  document['content'],
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                padding:
+                                    EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                                // width: 200.0,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(212, 234, 244, 1.0),
+                                    borderRadius: BorderRadius.circular(8.0)),
+                                margin: EdgeInsets.only(left: 10.0),
+                              )
+                            : Container(
+                                child: new Image.asset(
+                                  'images/${document['content']}.gif',
+                                  width: 100.0,
+                                  height: 100.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                margin: EdgeInsets.only(
+                                    bottom:
+                                        isLastMessageRight(index) ? 20.0 : 10.0,
+                                    right: 10.0),
+                              ),
               ],
             ),
 
@@ -519,6 +562,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: ChatBar(
         color: Colors.green,
         profilePic: widget.requesterAvatar,
@@ -571,9 +615,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                         Colors.green)));
                           } else {
                             roomData = snapshot.data;
-                            if(roomData['jobStatus'] == null) {
+                            if (roomData['jobStatus'] == null) {
                               jobStatus = 'open';
-                            }else {
+                            } else {
                               jobStatus = roomData['jobStatus'];
                             }
                             if (roomData['jobStatus'] == 'pending') {
@@ -584,15 +628,28 @@ class _ChatScreenState extends State<ChatScreen> {
                             if (roomData['jobStatus'] == 'workDone') {
                               _isWorkDoneButtonVisible = false;
                             }
+                            if (roomData['jobStatus'] == 'negotiating') {
+                              _isAcceptButtonVisible = false;
+                              _isNegoButtonVisible = false;
+                            }
+                            if (roomData['jobStatus'] == 'open') {
+                              _isAcceptButtonVisible = true;
+                              _isNegoButtonVisible = true;
+                            }
+                            // if (roomData['negoPrice'] == null) {
+                            //   listedPrice = widget.requestCompensation;
+                            // } else {
+                            //   listedPrice = roomData['negoPrice'];
+                            // }
                           }
 
                           return Column(
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
                               ListTile(
-                                 leading: Chip(
-                                   label: Text(jobStatus),
-                                 ),
+                                leading: Chip(
+                                  label: Text(jobStatus),
+                                ),
                                 title: Text(
                                     '${widget.requestCategory} @ ${widget.requestLocation}'),
                                 subtitle: Text(widget.requestDescription),
@@ -607,7 +664,179 @@ class _ChatScreenState extends State<ChatScreen> {
                                     visible: _isNegoButtonVisible,
                                     child: FlatButton(
                                       child: const Text('NEGOTIATE'),
-                                      onPressed: () {/* ... */},
+                                      onPressed: () {
+                                        /* ... */
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                  title:
+                                                      Text('Negotiate Price'),
+                                                  content: Form(
+                                                    key: _formKey,
+                                                    child: Column(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: <Widget>[
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  8.0),
+                                                          child: TextFormField(
+                                                            onChanged: (val) {
+                                                              setState(() {
+                                                                negoPrice = val;
+                                                              });
+                                                            },
+                                                            keyboardType:
+                                                                TextInputType
+                                                                    .number,
+                                                            cursorColor:
+                                                                Colors.green,
+                                                            decoration:
+                                                                InputDecoration(
+                                                                    prefixText:
+                                                                        'S\$',
+                                                                    // hintText: 'S\$',
+                                                                    hintStyle: TextStyle(
+                                                                        color: Colors
+                                                                            .grey),
+                                                                    focusColor:
+                                                                        Colors
+                                                                            .green,
+                                                                    fillColor:
+                                                                        Colors
+                                                                            .green,
+                                                                    hoverColor:
+                                                                        Colors
+                                                                            .green,
+                                                                    enabledBorder: OutlineInputBorder(
+                                                                        borderSide: BorderSide(
+                                                                            color: Colors.green[
+                                                                                200])),
+                                                                    focusedBorder: OutlineInputBorder(
+                                                                        borderSide: BorderSide(
+                                                                            color: Colors.green[
+                                                                                100])),
+                                                                    errorBorder: OutlineInputBorder(
+                                                                        borderSide: BorderSide(
+                                                                            color: Colors.red[
+                                                                                700])),
+                                                                    labelText:
+                                                                        'New Offer',
+                                                                    labelStyle:
+                                                                        TextStyle(color: Colors.grey[700])),
+                                                            validator: (value) {
+                                                              if (value
+                                                                  .isEmpty) {
+                                                                return 'Please input new offer';
+                                                              }
+                                                              return null;
+                                                            },
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                          child: RaisedButton(
+                                                            child: Text(
+                                                              "SUBMIT",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            ),
+                                                            onPressed:
+                                                                () async {
+                                                              // Validate returns true if the form is valid, or false
+                                                              // otherwise.
+                                                              if (_formKey
+                                                                  .currentState
+                                                                  .validate()) {
+                                                                _formKey
+                                                                    .currentState
+                                                                    .save();
+
+                                                                var documentReference = Firestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'rooms')
+                                                                    .document(
+                                                                        groupChatId)
+                                                                    .collection(
+                                                                        'messages')
+                                                                    .document(DateTime
+                                                                            .now()
+                                                                        .millisecondsSinceEpoch
+                                                                        .toString());
+
+                                                                Firestore
+                                                                    .instance
+                                                                    .runTransaction(
+                                                                        (transaction) async {
+                                                                  await transaction
+                                                                      .set(
+                                                                    documentReference,
+                                                                    {
+                                                                      'idFrom':
+                                                                          uid,
+                                                                      'idTo': widget
+                                                                          .requesterUid,
+                                                                      'timestamp': DateTime
+                                                                              .now()
+                                                                          .millisecondsSinceEpoch
+                                                                          .toString(),
+                                                                      'content':
+                                                                          "MADE AN OFFER: S\$$negoPrice",
+                                                                      'type': 2
+                                                                    },
+                                                                  );
+                                                                });
+
+                                                                dynamic
+                                                                    requestFormData =
+                                                                    await chat.negotiatePrice(
+                                                                        groupChatId,
+                                                                        negoPrice,
+                                                                        email);
+                                                                await chat
+                                                                    .updateNegoStatus(
+                                                                        groupChatId);
+                                                                // If the form is valid, display a Snackbar.
+                                                                if (requestFormData ==
+                                                                    null) {
+                                                                  setState(() {
+                                                                    error =
+                                                                        'submit fail';
+                                                                  });
+                                                                }
+                                                                _scaffoldKey
+                                                                    .currentState
+                                                                    .showSnackBar(
+                                                                        SnackBar(
+                                                                  behavior:
+                                                                      SnackBarBehavior
+                                                                          .floating,
+                                                                  content: Text(
+                                                                      'New offer submitted.'),
+                                                                ));
+                                                                Navigator.of(
+                                                                        context,
+                                                                        rootNavigator:
+                                                                            true)
+                                                                    .pop(true);
+                                                              }
+                                                            },
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ));
+                                            });
+                                      },
                                     ),
                                   ),
                                   Visibility(
@@ -627,9 +856,46 @@ class _ChatScreenState extends State<ChatScreen> {
                                       color: Colors.green,
                                       child: const Text('ACCEPT'),
                                       onPressed: () async {
+
+                                        var documentReference = Firestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'rooms')
+                                                                    .document(
+                                                                        groupChatId)
+                                                                    .collection(
+                                                                        'messages')
+                                                                    .document(DateTime
+                                                                            .now()
+                                                                        .millisecondsSinceEpoch
+                                                                        .toString());
+
+                                                                Firestore
+                                                                    .instance
+                                                                    .runTransaction(
+                                                                        (transaction) async {
+                                                                  await transaction
+                                                                      .set(
+                                                                    documentReference,
+                                                                    {
+                                                                      'idFrom':
+                                                                          uid,
+                                                                      'idTo': widget
+                                                                          .requesterUid,
+                                                                      'timestamp': DateTime
+                                                                              .now()
+                                                                          .millisecondsSinceEpoch
+                                                                          .toString(),
+                                                                      'content':
+                                                                          "ACCEPTED LISTED RATE: S\$${widget.requestCompensation}",
+                                                                      'type': 2
+                                                                    },
+                                                                  );
+                                                                });
+
                                         await req
                                             .updateRequestStatus(widget.docId);
-                                        await chat.updateJobStatus(groupChatId);
+                                        await chat.acceptListedRate(groupChatId, widget.requestCompensation);
                                       },
                                     ),
                                   ),
