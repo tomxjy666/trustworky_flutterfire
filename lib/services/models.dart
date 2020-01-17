@@ -40,6 +40,7 @@ class Room {
   String serviceProvider;
   String serviceProviderPhotoUrl;
   String serviceProviderDisplayName;
+  String serviceProviderUid;
   
 
   Room({
@@ -52,7 +53,8 @@ class Room {
     this.requestCompensation,
     this.serviceProvider,
     this.serviceProviderPhotoUrl,
-    this.serviceProviderDisplayName
+    this.serviceProviderDisplayName,
+    this.serviceProviderUid
   });
 }
 

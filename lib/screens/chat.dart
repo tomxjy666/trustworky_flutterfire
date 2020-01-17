@@ -12,6 +12,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:trustworky_flutterfire/shared/shared.dart';
 import 'package:trustworky_flutterfire/services/services.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ChatScreen extends StatefulWidget {
   final String docId;
@@ -52,12 +53,14 @@ class _ChatScreenState extends State<ChatScreen> {
   bool _isAcceptButtonVisible = true;
   bool _isNegoButtonVisible = true;
   bool _isWorkDoneButtonVisible = false;
-  // bool _isReviewButtonVisible = false;
+  bool _isReviewButtonVisible = false;
 
   String uid;
   String email;
   String error = '';
   String negoPrice = '';
+  String review = '';
+  double rating = 3.0;
 
   var listMessage;
   var listedPrice;
@@ -636,6 +639,17 @@ class _ChatScreenState extends State<ChatScreen> {
                               _isAcceptButtonVisible = true;
                               _isNegoButtonVisible = true;
                             }
+                            if (roomData['jobStatus'] == 'paid' && roomData['reviewServiceProvider'] == null) {
+                              _isReviewButtonVisible = true;
+                              _isAcceptButtonVisible = false;
+                              _isNegoButtonVisible = false;
+                            }
+                            if (roomData['jobStatus'] == 'paid' && roomData['reviewServiceProvider'] == true) {
+                              _isReviewButtonVisible = false;
+                              _isAcceptButtonVisible = false;
+                              _isNegoButtonVisible = false;
+                              _isWorkDoneButtonVisible = false;
+                            }
                             // if (roomData['negoPrice'] == null) {
                             //   listedPrice = widget.requestCompensation;
                             // } else {
@@ -840,6 +854,162 @@ class _ChatScreenState extends State<ChatScreen> {
                                     ),
                                   ),
                                   Visibility(
+                                    visible: _isReviewButtonVisible,
+                                    child: MaterialButton(
+                                      color: Colors.green,
+                                      child: const Text('LEAVE REVIEW'),
+                                      onPressed: () async {
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                    "Please write a review"),
+                                                content: Form(
+                                                  key: _formKey,
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: <Widget>[
+                                                      RatingBar(
+                                                        initialRating: 3,
+                                                        minRating: 1,
+                                                        direction:
+                                                            Axis.horizontal,
+                                                        allowHalfRating: true,
+                                                        itemCount: 5,
+                                                        itemPadding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    4.0),
+                                                        itemBuilder:
+                                                            (context, _) =>
+                                                                Icon(
+                                                          Icons.star,
+                                                          color: Colors.amber,
+                                                        ),
+                                                        onRatingUpdate: (val) {
+                                                          print(val);
+                                                          setState(() {
+                                                            rating = val;
+                                                          });
+                                                        },
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.all(8.0),
+                                                        child: TextFormField(
+                                                          minLines: 3,
+                                                          maxLines: 6,
+                                                          onChanged: (val) {
+                                                            setState(() {
+                                                              review = val;
+                                                            });
+                                                          },
+                                                          cursorColor:
+                                                              Colors.green,
+                                                          decoration: InputDecoration(
+                                                              hintText:
+                                                                  'Write something...',
+                                                              hintStyle: TextStyle(
+                                                                  color: Colors
+                                                                      .grey),
+                                                              focusColor:
+                                                                  Colors.green,
+                                                              fillColor:
+                                                                  Colors.green,
+                                                              hoverColor:
+                                                                  Colors.green,
+                                                              enabledBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: Colors.green[
+                                                                          200])),
+                                                              focusedBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: Colors.green[
+                                                                          100])),
+                                                              errorBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: Colors.red[
+                                                                          700])),
+                                                              labelStyle: TextStyle(
+                                                                  color: Colors.grey[700])),
+                                                          validator: (value) {
+                                                            if (value.isEmpty) {
+                                                              return 'Please leave a review';
+                                                            }
+                                                            return null;
+                                                          },
+                                                        ),
+                                                      ),
+                                                       Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                                  child: RaisedButton(
+                                                                    child: Text(
+                                                              "SUBMIT",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            ),
+                                                                    onPressed: () async {
+                                                                      if (_formKey
+                                                                  .currentState
+                                                                  .validate()) {
+                                                                _formKey
+                                                                    .currentState
+                                                                    .save();
+                                                                    dynamic
+                                                                    ratingFormData =
+                                                                    await chat.leaveReview(
+                                                                        widget.requesterUid,
+                                                                        rating,
+                                                                        review,
+                                                                        roomData['serviceProviderDisplayName'],
+                                                                        roomData['serviceProviderPhotoUrl']
+                                                                        );
+                                                                        await chat.reviewStatusServiceProvider(groupChatId);
+                                                              
+                                                                // If the form is valid, display a Snackbar.
+                                                                if (ratingFormData ==
+                                                                    null) {
+                                                                  setState(() {
+                                                                    error =
+                                                                        'submit fail';
+                                                                  });
+                                                                }
+                                                                _scaffoldKey
+                                                                    .currentState
+                                                                    .showSnackBar(
+                                                                        SnackBar(
+                                                                  behavior:
+                                                                      SnackBarBehavior
+                                                                          .floating,
+                                                                  content: Text(
+                                                                      'Review submitted.'),
+                                                                ));
+                                                                Navigator.of(
+                                                                        context,
+                                                                        rootNavigator:
+                                                                            true)
+                                                                    .pop(true);
+
+                                                                    }
+                                                                    },
+                                                                  ))
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            });
+                                      },
+                                    ),
+                                  ),
+                                  Visibility(
                                     visible: _isWorkDoneButtonVisible,
                                     child: MaterialButton(
                                       color: Colors.green,
@@ -856,46 +1026,36 @@ class _ChatScreenState extends State<ChatScreen> {
                                       color: Colors.green,
                                       child: const Text('ACCEPT'),
                                       onPressed: () async {
-
                                         var documentReference = Firestore
-                                                                    .instance
-                                                                    .collection(
-                                                                        'rooms')
-                                                                    .document(
-                                                                        groupChatId)
-                                                                    .collection(
-                                                                        'messages')
-                                                                    .document(DateTime
-                                                                            .now()
-                                                                        .millisecondsSinceEpoch
-                                                                        .toString());
+                                            .instance
+                                            .collection('rooms')
+                                            .document(groupChatId)
+                                            .collection('messages')
+                                            .document(DateTime.now()
+                                                .millisecondsSinceEpoch
+                                                .toString());
 
-                                                                Firestore
-                                                                    .instance
-                                                                    .runTransaction(
-                                                                        (transaction) async {
-                                                                  await transaction
-                                                                      .set(
-                                                                    documentReference,
-                                                                    {
-                                                                      'idFrom':
-                                                                          uid,
-                                                                      'idTo': widget
-                                                                          .requesterUid,
-                                                                      'timestamp': DateTime
-                                                                              .now()
-                                                                          .millisecondsSinceEpoch
-                                                                          .toString(),
-                                                                      'content':
-                                                                          "ACCEPTED LISTED RATE: S\$${widget.requestCompensation}",
-                                                                      'type': 2
-                                                                    },
-                                                                  );
-                                                                });
+                                        Firestore.instance.runTransaction(
+                                            (transaction) async {
+                                          await transaction.set(
+                                            documentReference,
+                                            {
+                                              'idFrom': uid,
+                                              'idTo': widget.requesterUid,
+                                              'timestamp': DateTime.now()
+                                                  .millisecondsSinceEpoch
+                                                  .toString(),
+                                              'content':
+                                                  "ACCEPTED LISTED RATE: S\$${widget.requestCompensation}",
+                                              'type': 2
+                                            },
+                                          );
+                                        });
 
                                         await req
                                             .updateRequestStatus(widget.docId);
-                                        await chat.acceptListedRate(groupChatId, widget.requestCompensation);
+                                        await chat.acceptListedRate(groupChatId,
+                                            widget.requestCompensation);
                                       },
                                     ),
                                   ),

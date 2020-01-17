@@ -22,9 +22,9 @@ class ChatService {
 
   //update job status pending
   Future acceptListedRate(String roomId, String finalisedCompensation) {
-    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+    DocumentReference roomRef = _db.collection('rooms').document(roomId);
 
-    return requestRef.updateData({
+    return roomRef.updateData({
       'jobStatus': 'pending',
       'finalisedCompensation': finalisedCompensation,
       'lastUpdated': DateTime.now()
@@ -33,9 +33,9 @@ class ChatService {
 
   //update job status work done
   Future updateWorkDoneStatus(String roomId) {
-    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+    DocumentReference roomRef = _db.collection('rooms').document(roomId);
 
-    return requestRef.updateData({
+    return roomRef.updateData({
       'jobStatus': 'workDone',
       'lastUpdated': DateTime.now()
     });
@@ -43,9 +43,9 @@ class ChatService {
 
   //update job status work done confimed
   Future confirmWorkDoneStatus(String roomId) {
-    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+    DocumentReference roomRef = _db.collection('rooms').document(roomId);
 
-    return requestRef.updateData({
+    return roomRef.updateData({
       'jobStatus': 'paid',
       'lastUpdated': DateTime.now()
     });
@@ -53,9 +53,9 @@ class ChatService {
 
   //update job price negotiation
   Future negotiatePrice(String roomId, String price, String email) {
-    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+    DocumentReference roomRef = _db.collection('rooms').document(roomId);
 
-    return requestRef.updateData({
+    return roomRef.updateData({
       'negoPrice': price,
       'negoUser': email,
       'lastUpdated': DateTime.now()
@@ -64,9 +64,9 @@ class ChatService {
 
   //update job status negotiating
   Future updateNegoStatus(String roomId) {
-    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+    DocumentReference roomRef = _db.collection('rooms').document(roomId);
 
-    return requestRef.updateData({
+    return roomRef.updateData({
       'jobStatus': 'negotiating',
       'lastUpdated': DateTime.now()
     });
@@ -74,9 +74,9 @@ class ChatService {
 
   //accept counter offer
   Future acceptOffer(String roomId, String finalisedCompensation) {
-    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+    DocumentReference roomRef = _db.collection('rooms').document(roomId);
 
-    return requestRef.updateData({
+    return roomRef.updateData({
       'jobStatus': 'pending',
       'finalisedCompensation': finalisedCompensation,
       'lastUpdated': DateTime.now()
@@ -85,10 +85,60 @@ class ChatService {
 
   //decline counter offer
   Future declineOffer(String roomId) {
-    DocumentReference requestRef = _db.collection('rooms').document(roomId);
+    DocumentReference roomRef = _db.collection('rooms').document(roomId);
 
-    return requestRef.updateData({
+    return roomRef.updateData({
       'jobStatus': 'open',
+      'lastUpdated': DateTime.now()
+    });
+  }
+
+  //update review status service provider
+  Future reviewStatusServiceProvider(String roomId) {
+    DocumentReference roomRef = _db.collection('rooms').document(roomId);
+
+    return roomRef.updateData({
+      'reviewServiceProvider': true,
+      'lastUpdated': DateTime.now()
+    });
+  }
+
+  //update review status requester
+  Future reviewStatusRequester(String roomId) {
+    DocumentReference roomRef = _db.collection('rooms').document(roomId);
+
+    return roomRef.updateData({
+      'reviewRequester': true,
+      'lastUpdated': DateTime.now()
+    });
+  }
+
+
+
+  //leave review
+  Future leaveReview(String userUid, double rating, String review, String reviewer, String reviewerPhotoUrl) {
+    DocumentReference userRef = _db.collection('users').document(userUid).collection('reviews').document();
+
+    return userRef.setData({
+      'from': 'service provider',
+      'reviewer': reviewer,
+      'reviewerPhotoUrl': reviewerPhotoUrl,
+      'content': review,
+      'rating': rating,
+      'lastUpdated': DateTime.now()
+    });
+  }
+
+  //leave review
+  Future leaveReviewRequester(String userUid, double rating, String review, String reviewer, String reviewerPhotoUrl) {
+    DocumentReference userRef = _db.collection('users').document(userUid).collection('reviews').document();
+
+    return userRef.setData({
+      'from': 'requester',
+      'reviewer': reviewer,
+      'reviewerPhotoUrl': reviewerPhotoUrl,
+      'content': review,
+      'rating': rating,
       'lastUpdated': DateTime.now()
     });
   }

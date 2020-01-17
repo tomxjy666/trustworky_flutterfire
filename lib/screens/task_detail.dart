@@ -77,6 +77,7 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 documentReference,
                 {
                   'serviceProvider': email,
+                  'serviceProviderUid': user.uid,
                   'serviceProviderDisplayName': user.displayName,
                   'serviceProviderPhotoUrl': user.photoUrl,
                   'requester': widget.request.requesterEmail,
@@ -84,7 +85,8 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                   'requesterPhotoUrl': widget.request.requesterPhotoUrl,
                   'requestDocId': widget.request.docId,
                   'requestCategory': widget.request.category,
-                  'requestCompensation': widget.request.compensation
+                  'requestCompensation': widget.request.compensation,
+                  'requesterUid': widget.request.requesterUid
                   // 'created': DateTime.now().millisecondsSinceEpoch.toString()
                 },
               );

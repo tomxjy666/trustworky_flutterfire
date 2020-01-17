@@ -12,10 +12,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:trustworky_flutterfire/shared/shared.dart';
 import 'package:trustworky_flutterfire/services/services.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ChatInboxScreen extends StatefulWidget {
   final String serviceProviderDisplayName;
   final String serviceProviderPhotoUrl;
+  final String serviceProviderUid;
   final String serviceProvider;
   final String docId;
   final String requestId;
@@ -32,6 +34,7 @@ class ChatInboxScreen extends StatefulWidget {
       {Key key,
       @required this.serviceProviderDisplayName,
       @required this.serviceProviderPhotoUrl,
+      @required this.serviceProviderUid,
       @required this.serviceProvider,
       @required this.docId,
       @required this.requestId,
@@ -50,14 +53,20 @@ class ChatInboxScreen extends StatefulWidget {
 }
 
 class _ChatInboxScreenState extends State<ChatInboxScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
   RequestService req = RequestService();
   ChatService chat = ChatService();
   bool _isVisible = true;
   bool _isAcceptOfferButtonVisible = false;
   bool _isDeclineOfferButtonVisible = false;
   bool _isConfirmWorkDoneButtonVisible = false;
+  bool _isReviewButtonVisible = false;
   String uid;
   String email;
+  String review = '';
+  String error = '';
+  double rating = 3.0;
 
   var listMessage;
   var roomData;
@@ -559,6 +568,7 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: ChatBar(
         color: Colors.green,
         profilePic: widget.serviceProviderPhotoUrl,
@@ -636,6 +646,19 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                               _isDeclineOfferButtonVisible = false;
                               _isAcceptOfferButtonVisible = false;
                             }
+                            if (roomData['jobStatus'] == 'paid' && roomData['reviewRequester'] == null) {
+                              _isReviewButtonVisible = true;
+                              _isConfirmWorkDoneButtonVisible = false;
+                              _isAcceptOfferButtonVisible = false;
+                              _isDeclineOfferButtonVisible = false;
+                            }
+                            if (roomData['jobStatus'] == 'paid' && roomData['reviewRequester'] == true) {
+                              _isReviewButtonVisible = false;
+                              _isConfirmWorkDoneButtonVisible = false;
+                              _isAcceptOfferButtonVisible = false;
+                              _isDeclineOfferButtonVisible = false;
+                          
+                            }
                           }
 
                           return Column(
@@ -665,79 +688,73 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                       child: const Text('DECLINE OFFER'),
                                       onPressed: () {
                                         showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return AlertDialog(
-                                              title: Text('Confirm Decline Offer'),
-                                              actions: <Widget>[
-                                                FlatButton(
-                                                  onPressed: () {
-                                                     Navigator.of(context,
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                    'Confirm Decline Offer'),
+                                                actions: <Widget>[
+                                                  FlatButton(
+                                                    onPressed: () {
+                                                      Navigator.of(context,
                                                               rootNavigator:
                                                                   true)
                                                           .pop(true);
+                                                    },
+                                                    child: Text('CANCEL'),
+                                                  ),
+                                                  FlatButton(
+                                                    onPressed: () async {
+                                                      final String decline =
+                                                          "DECLINED OFFER: S\$";
 
-                                                  },
-                                                  child: Text('CANCEL'),
-                                                ),
-                                                FlatButton(
-                                                  onPressed: () async {
-                                                    final String decline = "DECLINED OFFER: S\$";
+                                                      var documentReference =
+                                                          Firestore.instance
+                                                              .collection(
+                                                                  'rooms')
+                                                              .document(
+                                                                  groupChatId)
+                                                              .collection(
+                                                                  'messages')
+                                                              .document(DateTime
+                                                                      .now()
+                                                                  .millisecondsSinceEpoch
+                                                                  .toString());
 
-var documentReference = Firestore
-                                                                    .instance
-                                                                    .collection(
-                                                                        'rooms')
-                                                                    .document(
-                                                                        groupChatId)
-                                                                    .collection(
-                                                                        'messages')
-                                                                    .document(DateTime
-                                                                            .now()
-                                                                        .millisecondsSinceEpoch
-                                                                        .toString());
+                                                      Firestore.instance
+                                                          .runTransaction(
+                                                              (transaction) async {
+                                                        await transaction.set(
+                                                          documentReference,
+                                                          {
+                                                            'idFrom': uid,
+                                                            'idTo': widget
+                                                                .requesterUid,
+                                                            'timestamp': DateTime
+                                                                    .now()
+                                                                .millisecondsSinceEpoch
+                                                                .toString(),
+                                                            'content': decline +
+                                                                roomData[
+                                                                    'negoPrice'],
+                                                            'type': 2
+                                                          },
+                                                        );
+                                                      });
 
-                                                                Firestore
-                                                                    .instance
-                                                                    .runTransaction(
-                                                                        (transaction) async {
-                                                                  await transaction
-                                                                      .set(
-                                                                    documentReference,
-                                                                    {
-                                                                      'idFrom':
-                                                                          uid,
-                                                                      'idTo': widget
-                                                                          .requesterUid,
-                                                                      'timestamp': DateTime
-                                                                              .now()
-                                                                          .millisecondsSinceEpoch
-                                                                          .toString(),
-                                                                      'content': decline
-                                                                          + roomData['negoPrice'],
-                                                                      'type': 2
-                                                                    },
-                                                                  );
-                                                                });
-
-
-                                                      
-                                                        await chat
-                                                                    .declineOffer(
-                                                                        groupChatId);
-                                                        Navigator.of(context,
-                                                                rootNavigator:
-                                                                    true)
-                                                            .pop(true);
-
-                                                  },
-                                                  child: Text('DECLINE OFFER'),
-                                                )
-                                              ],
-                                            );
-
-                                          }
-                                        );
+                                                      await chat.declineOffer(
+                                                          groupChatId);
+                                                      Navigator.of(context,
+                                                              rootNavigator:
+                                                                  true)
+                                                          .pop(true);
+                                                    },
+                                                    child:
+                                                        Text('DECLINE OFFER'),
+                                                  )
+                                                ],
+                                              );
+                                            });
                                       },
                                     ),
                                   ),
@@ -753,7 +770,8 @@ var documentReference = Firestore
                                               return AlertDialog(
                                                 title: Text(
                                                     'Confirm Accept Offer?'),
-                                                content: Text('Once you accept the Service Provider\'s offer, you\'ll be able to leave a review for each other.' ),    
+                                                content: Text(
+                                                    'Once you accept the Service Provider\'s offer, you\'ll be able to leave a review for each other.'),
                                                 actions: <Widget>[
                                                   FlatButton(
                                                     onPressed: () {
@@ -766,50 +784,50 @@ var documentReference = Firestore
                                                   ),
                                                   FlatButton(
                                                       onPressed: () async {
-                                                        final String accept = "ACCEPTED OFFER: S\$";
+                                                        final String accept =
+                                                            "ACCEPTED OFFER: S\$";
 
-var documentReference = Firestore
-                                                                    .instance
-                                                                    .collection(
-                                                                        'rooms')
-                                                                    .document(
-                                                                        groupChatId)
-                                                                    .collection(
-                                                                        'messages')
-                                                                    .document(DateTime
-                                                                            .now()
-                                                                        .millisecondsSinceEpoch
-                                                                        .toString());
+                                                        var documentReference =
+                                                            Firestore.instance
+                                                                .collection(
+                                                                    'rooms')
+                                                                .document(
+                                                                    groupChatId)
+                                                                .collection(
+                                                                    'messages')
+                                                                .document(DateTime
+                                                                        .now()
+                                                                    .millisecondsSinceEpoch
+                                                                    .toString());
 
-                                                                Firestore
-                                                                    .instance
-                                                                    .runTransaction(
-                                                                        (transaction) async {
-                                                                  await transaction
-                                                                      .set(
-                                                                    documentReference,
-                                                                    {
-                                                                      'idFrom':
-                                                                          uid,
-                                                                      'idTo': widget
-                                                                          .requesterUid,
-                                                                      'timestamp': DateTime
-                                                                              .now()
-                                                                          .millisecondsSinceEpoch
-                                                                          .toString(),
-                                                                      'content': accept
-                                                                          + roomData['negoPrice'],
-                                                                      'type': 2
-                                                                    },
-                                                                  );
-                                                                });
-
+                                                        Firestore.instance
+                                                            .runTransaction(
+                                                                (transaction) async {
+                                                          await transaction.set(
+                                                            documentReference,
+                                                            {
+                                                              'idFrom': uid,
+                                                              'idTo': widget
+                                                                  .requesterUid,
+                                                              'timestamp': DateTime
+                                                                      .now()
+                                                                  .millisecondsSinceEpoch
+                                                                  .toString(),
+                                                              'content': accept +
+                                                                  roomData[
+                                                                      'negoPrice'],
+                                                              'type': 2
+                                                            },
+                                                          );
+                                                        });
 
                                                         await req
-                                            .updateRequestStatus(widget.docId);
-                                                        await chat
-                                                                    .acceptOffer(
-                                                                        groupChatId, roomData['negoPrice']);
+                                                            .updateRequestStatus(
+                                                                widget.docId);
+                                                        await chat.acceptOffer(
+                                                            groupChatId,
+                                                            roomData[
+                                                                'negoPrice']);
                                                         Navigator.of(context,
                                                                 rootNavigator:
                                                                     true)
@@ -830,6 +848,161 @@ var documentReference = Firestore
                                       onPressed: () async {
                                         await chat
                                             .confirmWorkDoneStatus(groupChatId);
+                                      },
+                                    ),
+                                  ),Visibility(
+                                    visible: _isReviewButtonVisible,
+                                    child: MaterialButton(
+                                      color: Colors.green,
+                                      child: const Text('LEAVE REVIEW'),
+                                      onPressed: () async {
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                    "Please write a review"),
+                                                content: Form(
+                                                  key: _formKey,
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: <Widget>[
+                                                      RatingBar(
+                                                        initialRating: 3,
+                                                        minRating: 1,
+                                                        direction:
+                                                            Axis.horizontal,
+                                                        allowHalfRating: true,
+                                                        itemCount: 5,
+                                                        itemPadding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    4.0),
+                                                        itemBuilder:
+                                                            (context, _) =>
+                                                                Icon(
+                                                          Icons.star,
+                                                          color: Colors.amber,
+                                                        ),
+                                                        onRatingUpdate: (val) {
+                                                          print(val);
+                                                          setState(() {
+                                                            rating = val;
+                                                          });
+                                                        },
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.all(8.0),
+                                                        child: TextFormField(
+                                                          minLines: 3,
+                                                          maxLines: 6,
+                                                          onChanged: (val) {
+                                                            setState(() {
+                                                              review = val;
+                                                            });
+                                                          },
+                                                          cursorColor:
+                                                              Colors.green,
+                                                          decoration: InputDecoration(
+                                                              hintText:
+                                                                  'Write something...',
+                                                              hintStyle: TextStyle(
+                                                                  color: Colors
+                                                                      .grey),
+                                                              focusColor:
+                                                                  Colors.green,
+                                                              fillColor:
+                                                                  Colors.green,
+                                                              hoverColor:
+                                                                  Colors.green,
+                                                              enabledBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: Colors.green[
+                                                                          200])),
+                                                              focusedBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: Colors.green[
+                                                                          100])),
+                                                              errorBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: Colors.red[
+                                                                          700])),
+                                                              labelStyle: TextStyle(
+                                                                  color: Colors.grey[700])),
+                                                          validator: (value) {
+                                                            if (value.isEmpty) {
+                                                              return 'Please leave a review';
+                                                            }
+                                                            return null;
+                                                          },
+                                                        ),
+                                                      ),
+                                                       Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                                  child: RaisedButton(
+                                                                    child: Text(
+                                                              "SUBMIT",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            ),
+                                                                    onPressed: () async {
+                                                                      if (_formKey
+                                                                  .currentState
+                                                                  .validate()) {
+                                                                _formKey
+                                                                    .currentState
+                                                                    .save();
+                                                                    dynamic
+                                                                    ratingFormData =
+                                                                    await chat.leaveReviewRequester(
+                                                                        roomData['serviceProviderUid'],
+                                                                        rating,
+                                                                        review,
+                                                                        roomData['requesterDisplayName'],
+                                                                        roomData['requesterPhotoUrl']
+                                                                        );
+                                                                        await chat.reviewStatusRequester(groupChatId);
+                                                              
+                                                                // If the form is valid, display a Snackbar.
+                                                                if (ratingFormData ==
+                                                                    null) {
+                                                                  setState(() {
+                                                                    error =
+                                                                        'submit fail';
+                                                                  });
+                                                                }
+                                                                _scaffoldKey
+                                                                    .currentState
+                                                                    .showSnackBar(
+                                                                        SnackBar(
+                                                                  behavior:
+                                                                      SnackBarBehavior
+                                                                          .floating,
+                                                                  content: Text(
+                                                                      'Review submitted.'),
+                                                                ));
+                                                                Navigator.of(
+                                                                        context,
+                                                                        rootNavigator:
+                                                                            true)
+                                                                    .pop(true);
+
+                                                                    }
+                                                                    },
+                                                                  ))
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            });
                                       },
                                     ),
                                   ),

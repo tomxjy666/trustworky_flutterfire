@@ -12,6 +12,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:trustworky_flutterfire/shared/shared.dart';
 import 'package:trustworky_flutterfire/services/services.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ChatInboxTaskScreen extends StatefulWidget {
   final String serviceProviderDisplayName;
@@ -62,10 +63,13 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
   bool _isAcceptButtonVisible = true;
   bool _isNegoButtonVisible = true;
   bool _isWorkDoneButtonVisible = false;
+  bool _isReviewButtonVisible = false;
   String uid;
   String email;
   String error = '';
   String negoPrice = '';
+  String review = '';
+  double rating = 3.0;
 
   var listMessage;
   var roomData;
@@ -384,7 +388,6 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                     : document['type'] == 2
                       // Offer
                       ? Container(
-                          alignment: Alignment.center,
                           child: Text(
                             document['content'],
                             style: TextStyle(
@@ -395,11 +398,8 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                           // width: 200.0,
                           decoration: BoxDecoration(
                               color: Color.fromRGBO(212, 234, 244, 1.0),
-                              // color: Colors.green,
                               borderRadius: BorderRadius.circular(8.0)),
-                          margin: EdgeInsets.only(
-                              bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                              right: 10.0),
+                          margin: EdgeInsets.only(left: 10.0),
                         )
                   // Sticker
                   : Container(
@@ -514,25 +514,22 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                             margin: EdgeInsets.only(left: 10.0),
                           )
                           : document['type'] == 2
-                      // Offer
-                      ? Container(
-                          alignment: Alignment.center,
-                          child: Text(
-                            document['content'],
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600),
-                          ),
-                          padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                          // width: 200.0,
-                          decoration: BoxDecoration(
-                              color: Color.fromRGBO(212, 234, 244, 1.0),
-                              // color: Colors.green,
-                              borderRadius: BorderRadius.circular(8.0)),
-                          margin: EdgeInsets.only(
-                              bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                              right: 10.0),
-                        )
+                            // Offer
+                            ? Container(
+                                child: Text(
+                                  document['content'],
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                padding:
+                                    EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                                // width: 200.0,
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(212, 234, 244, 1.0),
+                                    borderRadius: BorderRadius.circular(8.0)),
+                                margin: EdgeInsets.only(left: 10.0),
+                              )
                         : Container(
                             child: new Image.asset(
                               'images/${document['content']}.gif',
@@ -647,10 +644,16 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                               _isAcceptButtonVisible = true;
                               _isNegoButtonVisible = true;
                             }
-                            if (roomData['jobStatus'] == 'paid') {
+                            if (roomData['jobStatus'] == 'paid' && roomData['reviewServiceProvider'] == null) {
+                              _isReviewButtonVisible = true;
                               _isAcceptButtonVisible = false;
                               _isNegoButtonVisible = false;
-                              // _isWorkDoneButtonVisible = true;
+                            }
+                            if (roomData['jobStatus'] == 'paid' && roomData['reviewServiceProvider'] == true) {
+                              _isReviewButtonVisible = false;
+                              _isAcceptButtonVisible = false;
+                              _isNegoButtonVisible = false;
+                              _isWorkDoneButtonVisible = false;
                             }
                           }
                           return Column(
@@ -845,6 +848,161 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                                                       ],
                                                     ),
                                                   ));
+                                            });
+                                      },
+                                    ),
+                                  ),Visibility(
+                                    visible: _isReviewButtonVisible,
+                                    child: MaterialButton(
+                                      color: Colors.green,
+                                      child: const Text('LEAVE REVIEW'),
+                                      onPressed: () async {
+                                        showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: Text(
+                                                    "Please write a review"),
+                                                content: Form(
+                                                  key: _formKey,
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: <Widget>[
+                                                      RatingBar(
+                                                        initialRating: 3,
+                                                        minRating: 1,
+                                                        direction:
+                                                            Axis.horizontal,
+                                                        allowHalfRating: true,
+                                                        itemCount: 5,
+                                                        itemPadding: EdgeInsets
+                                                            .symmetric(
+                                                                horizontal:
+                                                                    4.0),
+                                                        itemBuilder:
+                                                            (context, _) =>
+                                                                Icon(
+                                                          Icons.star,
+                                                          color: Colors.amber,
+                                                        ),
+                                                        onRatingUpdate: (val) {
+                                                          print(val);
+                                                          setState(() {
+                                                            rating = val;
+                                                          });
+                                                        },
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.all(8.0),
+                                                        child: TextFormField(
+                                                          minLines: 3,
+                                                          maxLines: 6,
+                                                          onChanged: (val) {
+                                                            setState(() {
+                                                              review = val;
+                                                            });
+                                                          },
+                                                          cursorColor:
+                                                              Colors.green,
+                                                          decoration: InputDecoration(
+                                                              hintText:
+                                                                  'Write something...',
+                                                              hintStyle: TextStyle(
+                                                                  color: Colors
+                                                                      .grey),
+                                                              focusColor:
+                                                                  Colors.green,
+                                                              fillColor:
+                                                                  Colors.green,
+                                                              hoverColor:
+                                                                  Colors.green,
+                                                              enabledBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: Colors.green[
+                                                                          200])),
+                                                              focusedBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: Colors.green[
+                                                                          100])),
+                                                              errorBorder: OutlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: Colors.red[
+                                                                          700])),
+                                                              labelStyle: TextStyle(
+                                                                  color: Colors.grey[700])),
+                                                          validator: (value) {
+                                                            if (value.isEmpty) {
+                                                              return 'Please leave a review';
+                                                            }
+                                                            return null;
+                                                          },
+                                                        ),
+                                                      ),
+                                                       Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(8.0),
+                                                                  child: RaisedButton(
+                                                                    child: Text(
+                                                              "SUBMIT",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600),
+                                                            ),
+                                                                    onPressed: () async {
+                                                                      if (_formKey
+                                                                  .currentState
+                                                                  .validate()) {
+                                                                _formKey
+                                                                    .currentState
+                                                                    .save();
+                                                                    dynamic
+                                                                    ratingFormData =
+                                                                    await chat.leaveReview(
+                                                                        widget.requesterUid,
+                                                                        rating,
+                                                                        review,
+                                                                        roomData['serviceProviderDisplayName'],
+                                                                        roomData['serviceProviderPhotoUrl']
+                                                                        );
+                                                                        await chat.reviewStatusServiceProvider(groupChatId);
+                                                              
+                                                                // If the form is valid, display a Snackbar.
+                                                                if (ratingFormData ==
+                                                                    null) {
+                                                                  setState(() {
+                                                                    error =
+                                                                        'submit fail';
+                                                                  });
+                                                                }
+                                                                _scaffoldKey
+                                                                    .currentState
+                                                                    .showSnackBar(
+                                                                        SnackBar(
+                                                                  behavior:
+                                                                      SnackBarBehavior
+                                                                          .floating,
+                                                                  content: Text(
+                                                                      'Review submitted.'),
+                                                                ));
+                                                                Navigator.of(
+                                                                        context,
+                                                                        rootNavigator:
+                                                                            true)
+                                                                    .pop(true);
+
+                                                                    }
+                                                                    },
+                                                                  ))
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
                                             });
                                       },
                                     ),

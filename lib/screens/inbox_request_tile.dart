@@ -68,6 +68,7 @@ class _InboxRequestTileState extends State<InboxRequestTile> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ChatInboxScreen(
+                            serviceProviderUid: widget.room.serviceProviderUid,
                               serviceProviderPhotoUrl:
                                   widget.room.serviceProviderPhotoUrl,
                               serviceProviderDisplayName:
