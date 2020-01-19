@@ -10,6 +10,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:trustworky_flutterfire/screens/publicProfileChat.dart';
 import 'package:trustworky_flutterfire/shared/shared.dart';
 import 'package:trustworky_flutterfire/services/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -567,6 +568,13 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: ChatBar(
+        onprofileimagetap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      PublicProfileChatScreen(userUid: widget.requesterUid)));
+        },
         color: Colors.green,
         profilePic: widget.requesterAvatar,
         username: widget.requesterDisplayName,

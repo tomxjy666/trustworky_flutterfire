@@ -73,6 +73,8 @@ class _InboxTaskTileState extends State<InboxTaskTile> {
                               requesterPhotoUrl: widget.room.requesterPhotoUrl,
                               serviceProviderPhotoUrl:
                                   widget.room.serviceProviderPhotoUrl,
+                                  serviceProviderUid:
+                                  widget.room.serviceProviderUid,
                               serviceProviderDisplayName:
                                   widget.room.serviceProviderDisplayName,
                               serviceProvider: widget.room.serviceProvider,

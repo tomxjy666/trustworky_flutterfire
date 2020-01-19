@@ -10,6 +10,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:trustworky_flutterfire/screens/publicProfileChat.dart';
 import 'package:trustworky_flutterfire/shared/shared.dart';
 import 'package:trustworky_flutterfire/services/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -18,6 +19,7 @@ class ChatInboxTaskScreen extends StatefulWidget {
   final String serviceProviderDisplayName;
   final String serviceProviderPhotoUrl;
   final String serviceProvider;
+  final String serviceProviderUid;
   final String docId;
   // final String requestId;
   final String requestCategory;
@@ -36,6 +38,7 @@ class ChatInboxTaskScreen extends StatefulWidget {
       @required this.serviceProviderDisplayName,
       @required this.serviceProviderPhotoUrl,
       @required this.serviceProvider,
+      @required this.serviceProviderUid,
       @required this.docId,
       // @required this.requestId,
       @required this.requestCategory,
@@ -574,6 +577,13 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: ChatBar(
+        onprofileimagetap: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      PublicProfileChatScreen(userUid: widget.requesterUid)));
+        },
         color: Colors.green,
         profilePic: widget.requesterPhotoUrl,
         username: widget.requesterDisplayName,

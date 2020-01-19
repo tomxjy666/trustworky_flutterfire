@@ -573,9 +573,6 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
       key: _scaffoldKey,
       appBar: ChatBar(
         onprofileimagetap: () {
-          print(widget.serviceProvider);
-          print(widget.serviceProviderPhotoUrl);
-          print(widget.serviceProviderUid);
           Navigator.push(
               context,
               MaterialPageRoute(
