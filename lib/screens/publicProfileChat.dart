@@ -19,6 +19,7 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
   String friendRequesterDisplayName;
   @override
   Widget build(BuildContext context) {
+
     Widget buildItem(int index, DocumentSnapshot document) {
       return Card(
         child: ListTile(
@@ -39,6 +40,30 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
               )
             ],
           ),
+        ),
+      );
+    }
+
+    Widget buildFriendItem(int index, DocumentSnapshot document) {
+      return Card(
+        child: ListTile(
+          // leading: CircleAvatar(
+          //   radius: 20.0,
+          //   backgroundImage: NetworkImage(document['reviewerPhotoUrl']),
+          //   backgroundColor: Colors.transparent,
+          // ),
+          title: Text(document['name']),
+          subtitle: Text(document['friendUid']),
+          // trailing: Row(
+          //   mainAxisSize: MainAxisSize.min,
+          //   children: <Widget>[
+          //     Text(document['rating'].toString()),
+          //     Icon(
+          //       Icons.star,
+          //       color: Colors.green,
+          //     )
+          //   ],
+          // ),
         ),
       );
     }
@@ -73,8 +98,38 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
       );
     }
 
+    Widget buildListFriend() {
+      // return Flexible(
+      return StreamBuilder(
+        stream: Firestore.instance
+            .collection('users')
+            .document(widget.userUid)
+            .collection('friends')
+            // .orderBy('lastUpdated', descending: true)
+            // .limit(20)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return Center(
+                child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.green)));
+          } else {
+            listReview = snapshot.data.documents;
+            // print(listReview['reviewers']);
+            return ListView.builder(
+              padding: EdgeInsets.all(10.0),
+              itemBuilder: (context, index) =>
+                  buildFriendItem(index, snapshot.data.documents[index]),
+              itemCount: snapshot.data.documents.length,
+            );
+          }
+        },
+        // ),
+      );
+    }
+
     return DefaultTabController(
-      length: 1,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(),
         body: FutureBuilder(
@@ -230,14 +285,15 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                               Tab(
                                 text: "Reviews",
                               ),
-                              // Tab(
-                              //   text: "Friends",
-                              // ),
+                              Tab(
+                                 text: "Friends",
+                               ),
                             ]),
                         Container(
                           height: 500,
                           child: TabBarView(
-                            children: <Widget>[buildListReview()],
+                            children: <Widget>[buildListReview(),
+                            buildListFriend()],
                           ),
                         ),
                       ],

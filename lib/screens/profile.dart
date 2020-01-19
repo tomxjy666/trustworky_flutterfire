@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:trustworky_flutterfire/screens/friendrequests.dart';
 import 'package:trustworky_flutterfire/screens/screens.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
@@ -71,6 +72,18 @@ class ProfileScreen extends StatelessWidget {
                                 ReviewScreen(userUid: user.uid)));
                   },
                 ),
+                SettingsTile(
+                title: 'Friend Requests',
+                subtitle: 'Approve or ignore requests',
+                leading: Icon(Icons.group_add),
+                onTap: () {
+                  Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                FriendRequestScreen(userUid: user.uid)));
+                },
+              ),
                 SettingsTile(
                   title: 'Sign Out',
                   leading: Icon(Icons.exit_to_app),

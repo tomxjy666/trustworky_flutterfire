@@ -4,3 +4,4 @@ export 'db.dart';
 export 'globals.dart';
 export 'request.dart';
 export 'chat.dart';
+export 'friend.dart';
