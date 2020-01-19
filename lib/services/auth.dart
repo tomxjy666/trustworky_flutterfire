@@ -31,6 +31,7 @@ class AuthService {
       updateUserData(user);
       await prefs.setString('id', user.uid);
       await prefs.setString('email', user.email);
+      await prefs.setString('displayName', user.displayName);
       print(user);
       return user;
     } catch (error) {

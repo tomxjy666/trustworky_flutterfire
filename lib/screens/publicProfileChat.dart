@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class PublicProfileChatScreen extends StatefulWidget {
   final userUid;
@@ -10,8 +12,11 @@ class PublicProfileChatScreen extends StatefulWidget {
 }
 
 class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
+  SharedPreferences prefs;
   var listReview;
   var userData;
+  String uid;
+  String friendRequesterDisplayName;
   @override
   Widget build(BuildContext context) {
     Widget buildItem(int index, DocumentSnapshot document) {
@@ -73,10 +78,12 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
       child: Scaffold(
         appBar: AppBar(),
         body: FutureBuilder(
-            future: Firestore.instance
-                .collection('users')
-                .document(widget.userUid)
-                .get(),
+            future: 
+              Firestore.instance
+                  .collection('users')
+                  .document(widget.userUid)
+                  .get()
+            ,
             builder: (context, ds) {
               if (!ds.hasData) {
                 return Center(
@@ -144,7 +151,45 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                   color: Colors.green,
                                   size: 20.0,
                                 ),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  prefs = await SharedPreferences.getInstance();
+                                  // get currentUser unique id
+                                  uid = prefs.getString('id');
+                                  friendRequesterDisplayName =
+                                      prefs.getString('displayName');
+
+                                  var documentReference = Firestore.instance
+                                      .collection('users')
+                                      .document(widget.userUid)
+                                      .collection('friendRequests')
+                                      .document(uid);
+
+                                  Firestore.instance.runTransaction(
+                                      (Transaction transaction) async {
+                                    DocumentSnapshot friendRequestSnapshot =
+                                        await transaction
+                                            .get(documentReference);
+                                    if (friendRequestSnapshot.exists) {
+                                      print('Request Exists');
+                                      Fluttertoast.showToast(
+                                          msg: 'Request Already Sent!');
+                                    } else {
+                                      await transaction.set(
+                                        documentReference,
+                                        {
+                                          'friendRequesterDisplayName':
+                                              friendRequesterDisplayName,
+                                          'friendRequesterUid': uid,
+                                          'status': 'pending'
+                                        },
+                                      );
+                                      Fluttertoast.showToast(
+                                          msg: 'Request Sent!');
+
+                                  
+                                    }
+                                  });
+                                },
                               )
                             ],
                           ),
