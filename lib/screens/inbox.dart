@@ -18,6 +18,8 @@ class InboxScreen extends StatelessWidget {
               ),
             ),
             bottom: TabBar(
+              isScrollable: true,
+              indicatorSize: TabBarIndicatorSize.label,
               indicatorColor: Colors.green,
               labelColor: Colors.green,
               unselectedLabelColor: Colors.grey,

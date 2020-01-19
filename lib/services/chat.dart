@@ -156,7 +156,9 @@ class ChatService {
           requesterPhotoUrl: doc.data['requesterPhotoUrl'] ?? '',
           serviceProvider: doc.data['serviceProvider'] ?? '',
           serviceProviderDisplayName: doc.data['serviceProviderDisplayName'] ?? '',
-          serviceProviderPhotoUrl: doc.data['serviceProviderPhotoUrl'] ?? '');
+          serviceProviderUid: doc.data['serviceProviderUid'] ?? '',
+          serviceProviderPhotoUrl: doc.data['serviceProviderPhotoUrl'] ?? ''
+          );
     }).toList();
   }
 

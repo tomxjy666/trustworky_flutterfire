@@ -19,3 +19,4 @@ export 'inbox_task.dart';
 export 'inbox_task_list.dart';
 export 'inbox_task_tile.dart';
 export 'reviews.dart';
+export 'publicProfile.dart';

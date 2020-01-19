@@ -1,80 +1,88 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:trustworky_flutterfire/screens/screens.dart';
 import '../services/services.dart';
-import '../screens/screens.dart';
 import '../shared/shared.dart';
 import 'package:provider/provider.dart';
+import 'package:settings_ui/settings_ui.dart';
 
 class ProfileScreen extends StatelessWidget {
   final AuthService auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
-    // Report report = Provider.of<Report>(context);
     FirebaseUser user = Provider.of<FirebaseUser>(context);
 
     if (user != null) {
       String profilePicture = user.photoUrl.replaceAll('s96-c', 's400-c');
-      // dynamic activity = new DateTime.fromMillisecondsSinceEpoch(report.lastActivity * 1000);
       return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
-          title: Text(user.displayName ?? 'Guest', style: TextStyle(fontFamily: 'ProductSans', color: Colors.black,),),
-        
+          title: Row(
+            children: <Widget>[
+              new Padding(
+                padding: const EdgeInsets.all(8.0),
+                child:
+                    CircleAvatar(backgroundImage: NetworkImage(profilePicture)),
+              ),
+              Text(user.displayName,
+                  style: TextStyle(
+                      fontFamily: 'ProductSans', color: Colors.black)),
+            ],
+          ),
+          actions: <Widget>[
+            new IconButton(
+              icon: new Icon(FontAwesomeIcons.qrcode, color: Colors.black),
+              onPressed: () {},
+            ),
+            new IconButton(
+              icon: new Icon(FontAwesomeIcons.expand, color: Colors.black),
+              onPressed: () {},
+            )
+          ],
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (profilePicture != null)
-                Container(
-                  width: 60,
-                  height: 60,
-                  margin: EdgeInsets.only(top: 50, bottom: 10),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: NetworkImage(profilePicture),
-                    ),
-                  ),
+        body: SettingsList(
+          sections: [
+            SettingsSection(
+              title: 'Settings',
+              tiles: [
+                SettingsTile(
+                  title: 'My Profile',
+                  // subtitle: 'English',
+                  leading: Icon(FontAwesomeIcons.idBadge),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                PublicProfileScreen(user: user)));
+                  },
                 ),
-              Text(user.email ?? '',
-                  style: Theme.of(context).textTheme.title),
-                  OutlineButton(
-                  child: Text(
-                    'SEE REVIEWS',
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  // color: Colors.redAccent[400],
-                  onPressed: ()  {
-                    Navigator.push(context, MaterialPageRoute( builder: (context) => ReviewScreen(
-                      userUid: user.uid
-                    )));
-                  
-                  }
-                  ),
-              Spacer(),
-              // if (report != null)
-                //  Text(activity,
-                //      style: Theme.of(context).textTheme.display3),
-                //  Text('Last Logged In',
-                //      style: Theme.of(context).textTheme.subhead),
-              Spacer(),
-              FlatButton(
-                  child: Text(
-                    'LOGOUT',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  color: Colors.redAccent[400],
-                  onPressed: () async {
+                SettingsTile(
+                  title: 'My Reviews',
+                  // subtitle: 'English',
+                  leading: Icon(FontAwesomeIcons.mehBlank),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ReviewScreen(userUid: user.uid)));
+                  },
+                ),
+                SettingsTile(
+                  title: 'Sign Out',
+                  leading: Icon(Icons.exit_to_app),
+                  onTap: () async {
                     await auth.signOut();
                     Navigator.of(context)
                         .pushNamedAndRemoveUntil('/', (route) => false);
-                  }),
-              Spacer()
-            ],
-          ),
+                  },
+                ),
+              ],
+            ),
+          ],
         ),
       );
     } else {

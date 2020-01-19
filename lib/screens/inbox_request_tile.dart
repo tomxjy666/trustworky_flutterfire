@@ -18,6 +18,7 @@ class _InboxRequestTileState extends State<InboxRequestTile> {
   @override
   Widget build(BuildContext context) {
     FirebaseUser user = Provider.of<FirebaseUser>(context);
+    print(widget.room.serviceProviderUid);
     if (widget.room.requester == user.email) {
       _isVisible = true;
     }

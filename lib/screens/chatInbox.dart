@@ -10,6 +10,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:trustworky_flutterfire/screens/publicProfileChat.dart';
+// import 'package:trustworky_flutterfire/screens/screens.dart';
 import 'package:trustworky_flutterfire/shared/shared.dart';
 import 'package:trustworky_flutterfire/services/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -395,8 +397,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                               color: Color.fromRGBO(212, 234, 244, 1.0),
                               borderRadius: BorderRadius.circular(8.0)),
                           margin: EdgeInsets.only(
-                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
-                      right: 10.0),
+                              bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                              right: 10.0),
                         )
                       // Sticker
                       : Container(
@@ -570,6 +572,16 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: ChatBar(
+        onprofileimagetap: () {
+          print(widget.serviceProvider);
+          print(widget.serviceProviderPhotoUrl);
+          print(widget.serviceProviderUid);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      PublicProfileChatScreen(userUid: widget.serviceProviderUid)));
+        },
         color: Colors.green,
         profilePic: widget.serviceProviderPhotoUrl,
         username: widget.serviceProviderDisplayName,
@@ -646,18 +658,19 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                               _isDeclineOfferButtonVisible = false;
                               _isAcceptOfferButtonVisible = false;
                             }
-                            if (roomData['jobStatus'] == 'paid' && roomData['reviewRequester'] == null) {
+                            if (roomData['jobStatus'] == 'paid' &&
+                                roomData['reviewRequester'] == null) {
                               _isReviewButtonVisible = true;
                               _isConfirmWorkDoneButtonVisible = false;
                               _isAcceptOfferButtonVisible = false;
                               _isDeclineOfferButtonVisible = false;
                             }
-                            if (roomData['jobStatus'] == 'paid' && roomData['reviewRequester'] == true) {
+                            if (roomData['jobStatus'] == 'paid' &&
+                                roomData['reviewRequester'] == true) {
                               _isReviewButtonVisible = false;
                               _isConfirmWorkDoneButtonVisible = false;
                               _isAcceptOfferButtonVisible = false;
                               _isDeclineOfferButtonVisible = false;
-                          
                             }
                           }
 
@@ -850,7 +863,8 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                             .confirmWorkDoneStatus(groupChatId);
                                       },
                                     ),
-                                  ),Visibility(
+                                  ),
+                                  Visibility(
                                     visible: _isReviewButtonVisible,
                                     child: MaterialButton(
                                       color: Colors.green,
@@ -939,12 +953,12 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                                           },
                                                         ),
                                                       ),
-                                                       Padding(
+                                                      Padding(
                                                           padding:
                                                               const EdgeInsets
                                                                   .all(8.0),
-                                                                  child: RaisedButton(
-                                                                    child: Text(
+                                                          child: RaisedButton(
+                                                            child: Text(
                                                               "SUBMIT",
                                                               style: TextStyle(
                                                                   color: Colors
@@ -953,24 +967,29 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                                                       FontWeight
                                                                           .w600),
                                                             ),
-                                                                    onPressed: () async {
-                                                                      if (_formKey
+                                                            onPressed:
+                                                                () async {
+                                                              if (_formKey
                                                                   .currentState
                                                                   .validate()) {
                                                                 _formKey
                                                                     .currentState
                                                                     .save();
-                                                                    dynamic
+                                                                dynamic
                                                                     ratingFormData =
                                                                     await chat.leaveReviewRequester(
-                                                                        roomData['serviceProviderUid'],
+                                                                        roomData[
+                                                                            'serviceProviderUid'],
                                                                         rating,
                                                                         review,
-                                                                        roomData['requesterDisplayName'],
-                                                                        roomData['requesterPhotoUrl']
-                                                                        );
-                                                                        await chat.reviewStatusRequester(groupChatId);
-                                                              
+                                                                        roomData[
+                                                                            'requesterDisplayName'],
+                                                                        roomData[
+                                                                            'requesterPhotoUrl']);
+                                                                await chat
+                                                                    .reviewStatusRequester(
+                                                                        groupChatId);
+
                                                                 // If the form is valid, display a Snackbar.
                                                                 if (ratingFormData ==
                                                                     null) {
@@ -994,10 +1013,9 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
                                                                         rootNavigator:
                                                                             true)
                                                                     .pop(true);
-
-                                                                    }
-                                                                    },
-                                                                  ))
+                                                              }
+                                                            },
+                                                          ))
                                                     ],
                                                   ),
                                                 ),
