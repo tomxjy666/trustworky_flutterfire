@@ -399,7 +399,9 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                           decoration: BoxDecoration(
                               color: Color.fromRGBO(212, 234, 244, 1.0),
                               borderRadius: BorderRadius.circular(8.0)),
-                          margin: EdgeInsets.only(left: 10.0),
+                          margin: EdgeInsets.only(
+                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                      right: 10.0),
                         )
                   // Sticker
                   : Container(
