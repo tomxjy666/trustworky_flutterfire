@@ -2,14 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:trustworky_flutterfire/screens/friendrequests.dart';
+import 'package:trustworky_flutterfire/screens/publicProfileChat.dart';
 import 'package:trustworky_flutterfire/screens/screens.dart';
 import '../services/services.dart';
 import '../shared/shared.dart';
 import 'package:provider/provider.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:barcode_scan/barcode_scan.dart';
+import 'package:flutter/services.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  @override
+  _ProfileScreenState createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   final AuthService auth = AuthService();
+  String barcode = "";
+  @override
+  void initState() {
+    super.initState();
+  }
+  Future scan() async {
+    try {
+      String barcode = await BarcodeScanner.scan().then(
+        (result) => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      PublicProfileChatScreen(userUid: result)))
+      );
+      setState(() => this.barcode = barcode);
+    } on PlatformException catch (e) {
+      if (e.code == BarcodeScanner.CameraAccessDenied) {
+        setState(() {
+          this.barcode = 'The user did not grant the camera permission!';
+        });
+      } else {
+        setState(() => this.barcode = 'Unknown error: $e');
+      }
+    } on FormatException{
+      setState(() => this.barcode = 'null (User returned using the "back"-button before scanning anything. Result)');
+    } catch (e) {
+      setState(() => this.barcode = 'Unknown error: $e');
+    }
+  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +73,19 @@ class ProfileScreen extends StatelessWidget {
           actions: <Widget>[
             new IconButton(
               icon: new Icon(FontAwesomeIcons.qrcode, color: Colors.black),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                MyQrCodeScreen(user: user)));
+              },
             ),
             new IconButton(
               icon: new Icon(FontAwesomeIcons.expand, color: Colors.black),
-              onPressed: () {},
-            )
+              onPressed: scan,
+            ),
+            // new Text(barcode, style: TextStyle(color: Colors.black),),
           ],
         ),
         body: SettingsList(
@@ -70,6 +115,18 @@ class ProfileScreen extends StatelessWidget {
                         MaterialPageRoute(
                             builder: (context) =>
                                 ReviewScreen(userUid: user.uid)));
+                  },
+                ),
+                SettingsTile(
+                  title: 'My Friends',
+                  // subtitle: 'English',
+                  leading: Icon(FontAwesomeIcons.users),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                FriendListScreen(userUid: user.uid)));
                   },
                 ),
                 SettingsTile(

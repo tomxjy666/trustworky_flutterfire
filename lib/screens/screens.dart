@@ -20,3 +20,6 @@ export 'inbox_task_list.dart';
 export 'inbox_task_tile.dart';
 export 'reviews.dart';
 export 'publicProfile.dart';
+export 'friend_list.dart';
+export 'my_qr_code.dart';
+export 'qr_scanner.dart';
