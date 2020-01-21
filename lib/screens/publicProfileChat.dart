@@ -15,11 +15,21 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
   SharedPreferences prefs;
   var listReview;
   var userData;
+  var friendData;
   String uid;
   String friendRequesterDisplayName;
+  String friendRequesterPhotoUrl;
+  bool _isFriendRequestButtonVisible = false;
+
+  readLocal() async {
+    prefs = await SharedPreferences.getInstance();
+    // get currentUser unique id
+    uid = prefs.getString('id');
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-
     Widget buildItem(int index, DocumentSnapshot document) {
       return Card(
         child: ListTile(
@@ -47,13 +57,13 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
     Widget buildFriendItem(int index, DocumentSnapshot document) {
       return Card(
         child: ListTile(
-          // leading: CircleAvatar(
-          //   radius: 20.0,
-          //   backgroundImage: NetworkImage(document['reviewerPhotoUrl']),
-          //   backgroundColor: Colors.transparent,
-          // ),
+          leading: CircleAvatar(
+            radius: 20.0,
+            backgroundImage: NetworkImage(document['friendPhotoUrl']),
+            backgroundColor: Colors.transparent,
+          ),
           title: Text(document['name']),
-          subtitle: Text(document['friendUid']),
+          // subtitle: Text(document['friendUid']),
           // trailing: Row(
           //   mainAxisSize: MainAxisSize.min,
           //   children: <Widget>[
@@ -75,8 +85,6 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
             .collection('users')
             .document(widget.userUid)
             .collection('reviews')
-            // .orderBy('lastUpdated', descending: true)
-            // .limit(20)
             .snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
@@ -133,12 +141,10 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
       child: Scaffold(
         appBar: AppBar(),
         body: FutureBuilder(
-            future: 
-              Firestore.instance
-                  .collection('users')
-                  .document(widget.userUid)
-                  .get()
-            ,
+            future: Firestore.instance
+                .collection('users')
+                .document(widget.userUid)
+                .get(),
             builder: (context, ds) {
               if (!ds.hasData) {
                 return Center(
@@ -194,58 +200,91 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                 userData['email'],
                                 style: TextStyle(color: Colors.grey),
                               ),
-                              OutlineButton.icon(
-                                borderSide: BorderSide(
-                                  color: Colors.green,
-                                ),
-                                label: Text("SEND FRIEND REQUEST",
-                                    style: TextStyle(
-                                        fontSize: 12.0, color: Colors.green)),
-                                icon: Icon(
-                                  Icons.add,
-                                  color: Colors.green,
-                                  size: 20.0,
-                                ),
-                                onPressed: () async {
-                                  prefs = await SharedPreferences.getInstance();
-                                  // get currentUser unique id
-                                  uid = prefs.getString('id');
-                                  friendRequesterDisplayName =
-                                      prefs.getString('displayName');
-
-                                  var documentReference = Firestore.instance
+                              StreamBuilder(
+                                  stream: Firestore.instance
                                       .collection('users')
                                       .document(widget.userUid)
-                                      .collection('friendRequests')
-                                      .document(uid);
-
-                                  Firestore.instance.runTransaction(
-                                      (Transaction transaction) async {
-                                    DocumentSnapshot friendRequestSnapshot =
-                                        await transaction
-                                            .get(documentReference);
-                                    if (friendRequestSnapshot.exists) {
-                                      print('Request Exists');
-                                      Fluttertoast.showToast(
-                                          msg: 'Request Already Sent!');
+                                      .collection('friends').where("friendUid", isEqualTo: uid).snapshots()
+                               
+                                      ,
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      print('no data');
+                                      // setState(() {_isFriendRequestButtonVisible = true;});
+                                      // _isFriendRequestButtonVisible = true;
+                                      return Center(
+                                          child: CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      Colors.green)));
                                     } else {
-                                      await transaction.set(
-                                        documentReference,
-                                        {
-                                          'friendRequesterDisplayName':
-                                              friendRequesterDisplayName,
-                                          'friendRequesterUid': uid,
-                                          'status': 'pending'
-                                        },
-                                      );
-                                      Fluttertoast.showToast(
-                                          msg: 'Request Sent!');
+                                      print(snapshot.data.documents.length == 0);
+                                       if(snapshot.data.documents.length == 0) { 
+                                         _isFriendRequestButtonVisible = true;
+                                       }
+                                      return Visibility(
+                                        visible: _isFriendRequestButtonVisible,
+                                        child: OutlineButton.icon(
+                                          borderSide: BorderSide(
+                                            color: Colors.green,
+                                          ),
+                                          label: Text("SEND FRIEND REQUEST",
+                                              style: TextStyle(
+                                                  fontSize: 12.0,
+                                                  color: Colors.green)),
+                                          icon: Icon(
+                                            Icons.add,
+                                            color: Colors.green,
+                                            size: 20.0,
+                                          ),
+                                          onPressed: () async {
+                                            prefs = await SharedPreferences
+                                                .getInstance();
+                                            // get currentUser unique id
+                                            uid = prefs.getString('id');
+                                            friendRequesterDisplayName =
+                                                prefs.getString('displayName');
+                                                friendRequesterPhotoUrl = prefs.getString('photoUrl');
 
-                                  
+                                            var documentReference = Firestore
+                                                .instance
+                                                .collection('users')
+                                                .document(widget.userUid)
+                                                .collection('friendRequests')
+                                                .document(uid);
+
+                                            Firestore.instance.runTransaction(
+                                                (Transaction
+                                                    transaction) async {
+                                              DocumentSnapshot
+                                                  friendRequestSnapshot =
+                                                  await transaction
+                                                      .get(documentReference);
+                                              if (friendRequestSnapshot
+                                                  .exists) {
+                                                print('Request Exists');
+                                                Fluttertoast.showToast(
+                                                    msg:
+                                                        'Request Already Sent!');
+                                              } else {
+                                                await transaction.set(
+                                                  documentReference,
+                                                  { 'friendRequesterPhotoUrl': friendRequesterPhotoUrl,
+                                                    'friendRequesterDisplayName':
+                                                        friendRequesterDisplayName,
+                                                    'friendRequesterUid': uid,
+                                                    'status': 'pending'
+                                                  },
+                                                );
+                                                Fluttertoast.showToast(
+                                                    msg: 'Request Sent!');
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      );
                                     }
-                                  });
-                                },
-                              )
+                                  })
                             ],
                           ),
                           // Spacer(),
@@ -286,14 +325,16 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                 text: "Reviews",
                               ),
                               Tab(
-                                 text: "Friends",
-                               ),
+                                text: "Friends",
+                              ),
                             ]),
                         Container(
                           height: 500,
                           child: TabBarView(
-                            children: <Widget>[buildListReview(),
-                            buildListFriend()],
+                            children: <Widget>[
+                              buildListReview(),
+                              buildListFriend()
+                            ],
                           ),
                         ),
                       ],

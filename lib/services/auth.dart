@@ -32,6 +32,8 @@ class AuthService {
       await prefs.setString('id', user.uid);
       await prefs.setString('email', user.email);
       await prefs.setString('displayName', user.displayName);
+      await prefs.setString('photoUrl', user.photoUrl);
+    
       print(user);
       return user;
     } catch (error) {

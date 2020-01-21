@@ -71,7 +71,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.green,
-          title: Text('Reviews',
+          title: Text('My Reviews',
               style: TextStyle(
                 fontFamily: 'ProductSans',
                 color: Colors.white,

@@ -25,13 +25,13 @@ class FriendService {
     return friendRequestRef.delete();
   }
 
-  Future addFriend(String name, String userUid) {
-    DocumentReference friendRef = _db.collection('users').document(userUid).collection('friends').document(userUid);
+  Future addFriend(String userUid, String friendUid, String friendName, String friendPhotoUrl) {
+    DocumentReference friendRef = _db
+        .collection('users')
+        .document(userUid)
+        .collection('friends')
+        .document(friendUid);
 
-    return friendRef.setData({
-      'name': name,
-      'friendUid': userUid
-    });
-
+    return friendRef.setData({'name': friendName, 'friendUid': friendUid, 'friendPhotoUrl': friendPhotoUrl});
   }
 }

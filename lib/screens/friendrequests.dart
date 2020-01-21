@@ -19,17 +19,18 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
   var listReview;
   String uid;
   String name;
+  String photoUrl;
 
   @override
   Widget build(BuildContext context) {
     Widget buildItem(int index, DocumentSnapshot document) {
       return Card(
         child: ListTile(
-          // leading: CircleAvatar(
-          //   radius: 20.0,
-          //   backgroundImage: NetworkImage(document['reviewerPhotoUrl']),
-          //   backgroundColor: Colors.transparent,
-          // ),
+          leading: CircleAvatar(
+            radius: 20.0,
+            backgroundImage: NetworkImage(document['friendRequesterPhotoUrl']),
+            backgroundColor: Colors.transparent,
+          ),
           title: Text(document['friendRequesterDisplayName']),
           subtitle: Text(document['status']),
           trailing: Row(
@@ -49,9 +50,12 @@ class _FriendRequestScreenState extends State<FriendRequestScreen> {
                   prefs = await SharedPreferences.getInstance();
                   uid = prefs.getString('id');
                   name = prefs.getString('displayName');
+                  photoUrl = prefs.getString('photoUrl');
                   await friend.acceptFriendRequest(uid, document['friendRequesterUid']);
-                  await friend.addFriend(document['friendRequesterDisplayName'], document['friendRequesterUid']);
-                  await friend.addFriend(name, uid);
+                  // add to current user friend list
+                  await friend.addFriend(uid, document['friendRequesterUid'],document['friendRequesterDisplayName'], document['friendRequesterPhotoUrl']);
+                  // add to opposite user friend list
+                  await friend.addFriend(document['friendRequesterUid'], uid, name, photoUrl );
                 },
               )
             ],
