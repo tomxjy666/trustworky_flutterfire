@@ -95,6 +95,7 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
             listReview = snapshot.data.documents;
             // print(listReview['reviewers']);
             return ListView.builder(
+              shrinkWrap: true,
               padding: EdgeInsets.all(10.0),
               itemBuilder: (context, index) =>
                   buildItem(index, snapshot.data.documents[index]),
@@ -125,6 +126,7 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
             listReview = snapshot.data.documents;
             // print(listReview['reviewers']);
             return ListView.builder(
+              shrinkWrap: true,
               padding: EdgeInsets.all(10.0),
               itemBuilder: (context, index) =>
                   buildFriendItem(index, snapshot.data.documents[index]),
@@ -329,8 +331,9 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                               ),
                             ]),
                         Container(
-                          height: 500,
-                          child: TabBarView(
+                        height: 475,
+                          child: 
+                          TabBarView(
                             children: <Widget>[
                               buildListReview(),
                               buildListFriend()
