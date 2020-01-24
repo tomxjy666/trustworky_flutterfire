@@ -12,14 +12,14 @@ class Global {
 
     // Data Models
   static final Map models = {
-    Topic: (data) => Topic.fromMap(data),
-    Quiz: (data) => Quiz.fromMap(data),
+    // Topic: (data) => Topic.fromMap(data),
+    // Quiz: (data) => Quiz.fromMap(data),
     User: (data) => User.fromMap(data),
     // Request: (data) => Request.fromMap(data)
   };
 
   // Firestore References for Writes
-  static final Collection<Topic> topicsRef = Collection<Topic>(path: 'topics');
+  // static final Collection<Topic> topicsRef = Collection<Topic>(path: 'topics');
   // static final Collection<Request> requestRef = Collection<Request>(path: 'requests');
   static final UserData<User> userRef = UserData<User>(collection: 'users'); 
 
