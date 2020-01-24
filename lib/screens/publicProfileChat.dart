@@ -206,9 +206,9 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                   stream: Firestore.instance
                                       .collection('users')
                                       .document(widget.userUid)
-                                      .collection('friends').where("friendUid", isEqualTo: uid).snapshots()
-                               
-                                      ,
+                                      .collection('friends')
+                                      .where("friendUid", isEqualTo: uid)
+                                      .snapshots(),
                                   builder: (context, snapshot) {
                                     if (!snapshot.hasData) {
                                       print('no data');
@@ -220,10 +220,11 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                                   AlwaysStoppedAnimation<Color>(
                                                       Colors.green)));
                                     } else {
-                                      print(snapshot.data.documents.length == 0);
-                                       if(snapshot.data.documents.length == 0) { 
-                                         _isFriendRequestButtonVisible = true;
-                                       }
+                                      print(
+                                          snapshot.data.documents.length == 0);
+                                      if (snapshot.data.documents.length == 0) {
+                                        _isFriendRequestButtonVisible = true;
+                                      }
                                       return Visibility(
                                         visible: _isFriendRequestButtonVisible,
                                         child: OutlineButton.icon(
@@ -246,7 +247,8 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                             uid = prefs.getString('id');
                                             friendRequesterDisplayName =
                                                 prefs.getString('displayName');
-                                                friendRequesterPhotoUrl = prefs.getString('photoUrl');
+                                            friendRequesterPhotoUrl =
+                                                prefs.getString('photoUrl');
 
                                             var documentReference = Firestore
                                                 .instance
@@ -271,7 +273,9 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                               } else {
                                                 await transaction.set(
                                                   documentReference,
-                                                  { 'friendRequesterPhotoUrl': friendRequesterPhotoUrl,
+                                                  {
+                                                    'friendRequesterPhotoUrl':
+                                                        friendRequesterPhotoUrl,
                                                     'friendRequesterDisplayName':
                                                         friendRequesterDisplayName,
                                                     'friendRequesterUid': uid,
@@ -330,14 +334,15 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                 text: "Friends",
                               ),
                             ]),
-                        Container(
-                        height: 475,
-                          child: 
-                          TabBarView(
-                            children: <Widget>[
-                              buildListReview(),
-                              buildListFriend()
-                            ],
+                        Expanded(
+                          child: Container(
+                            // height: 475,
+                            child: TabBarView(
+                              children: <Widget>[
+                                buildListReview(),
+                                buildListFriend()
+                              ],
+                            ),
                           ),
                         ),
                       ],
