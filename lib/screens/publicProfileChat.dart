@@ -334,15 +334,13 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                 text: "Friends",
                               ),
                             ]),
-                        Expanded(
-                          child: Container(
-                            // height: 475,
-                            child: TabBarView(
-                              children: <Widget>[
-                                buildListReview(),
-                                buildListFriend()
-                              ],
-                            ),
+                        Container(
+                          height: 450,
+                          child: TabBarView(
+                            children: <Widget>[
+                              buildListReview(),
+                              buildListFriend()
+                            ],
                           ),
                         ),
                       ],
