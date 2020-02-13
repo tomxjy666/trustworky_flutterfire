@@ -882,7 +882,7 @@ class _ChatInboxTaskScreenState extends State<ChatInboxTaskScreen> {
                                                         MainAxisSize.min,
                                                     children: <Widget>[
                                                       RatingBar(
-                                                        initialRating: 3,
+                                                        initialRating: 5,
                                                         minRating: 1,
                                                         direction:
                                                             Axis.horizontal,

@@ -880,7 +880,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                                         MainAxisSize.min,
                                                     children: <Widget>[
                                                       RatingBar(
-                                                        initialRating: 3,
+                                                        initialRating: 5,
                                                         minRating: 1,
                                                         direction:
                                                             Axis.horizontal,
