@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:trustworky_flutterfire/screens/publicProfileChat.dart';
 
 class FriendListScreen extends StatefulWidget {
   final String userUid;
@@ -16,7 +17,6 @@ class _FriendListScreenState extends State<FriendListScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     Widget buildFriendItem(int index, DocumentSnapshot document) {
       return Card(
         child: ListTile(
@@ -26,6 +26,13 @@ class _FriendListScreenState extends State<FriendListScreen> {
             backgroundColor: Colors.transparent,
           ),
           title: Text(document['name']),
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => PublicProfileChatScreen(
+                        userUid: document['friendUid'])));
+          },
           // subtitle: Text(document['friendUid']),
           // trailing: Row(
           //   mainAxisSize: MainAxisSize.min,
@@ -70,7 +77,6 @@ class _FriendListScreenState extends State<FriendListScreen> {
         // ),
       );
     }
-    
 
     return Scaffold(
         appBar: AppBar(
