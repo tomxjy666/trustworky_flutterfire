@@ -211,7 +211,7 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                       .snapshots(),
                                   builder: (context, snapshot) {
                                     if (!snapshot.hasData) {
-                                      print('no data');
+                                      print('snapShot no data');
                                       // setState(() {_isFriendRequestButtonVisible = true;});
                                       // _isFriendRequestButtonVisible = true;
                                       return Center(
@@ -220,8 +220,9 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                                   AlwaysStoppedAnimation<Color>(
                                                       Colors.green)));
                                     } else {
-                                      print(
-                                          snapshot.data.documents.length == 0);
+                                      // print(
+                                      //     snapshot.data.documents.length == 0);
+                                      // print(uid);
                                       if (snapshot.data.documents.length == 0) {
                                         _isFriendRequestButtonVisible = true;
                                       }

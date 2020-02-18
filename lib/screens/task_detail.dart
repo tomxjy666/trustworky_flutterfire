@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:trustworky_flutterfire/screens/publicProfileChat.dart';
 import 'package:trustworky_flutterfire/services/services.dart';
 import 'package:time_formatter/time_formatter.dart';
 import 'package:provider/provider.dart';
@@ -41,16 +42,47 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
         padding: EdgeInsets.all(16.0),
         child: Center(
             child: Container(
-                child: Column(
-          children: <Widget>[
-            Text(widget.request.category),
-            Text(widget.request.compensation),
-            Text(widget.request.description),
-            Text(widget.request.location),
-            Text(widget.request.requesterDisplayName),
-            Text(widget.request.requesterEmail),
-            Text(formatted)
-          ],
+                child: Card(
+          child: Column(
+            children: <Widget>[
+              new ListTile(
+                leading: new Icon(Icons.person),
+                title: new Text(widget.request.requesterDisplayName),
+                subtitle: new Text(widget.request.requesterEmail),
+                onTap: () {
+                  Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => PublicProfileChatScreen(
+                        userUid: widget.request.requesterUid)));
+                },
+              ),
+              new ListTile(
+                leading: new Icon(Icons.build),
+                title: new Text(widget.request.category),
+              ),
+              new ListTile(
+                leading: new Icon(Icons.attach_money),
+                title: new Text(widget.request.compensation),
+              ),
+              new ListTile(
+                leading: new Icon(Icons.subject),
+                title: new Text(widget.request.description),
+              ),
+              new ListTile(
+                leading: new Icon(Icons.location_on),
+                title: new Text(widget.request.location),
+              ),
+              new ListTile(
+                leading: new Icon(Icons.build),
+                title: new Text(widget.request.category),
+              ),
+              new ListTile(
+                leading: new Icon(Icons.calendar_today),
+                title: new Text(formatted),
+              ),
+            ],
+          ),
         ))),
       ),
       floatingActionButton: Visibility(
@@ -68,30 +100,29 @@ class _TaskDetailScreenState extends State<TaskDetailScreen> {
                 Firestore.instance.collection('rooms').document(groupChatId);
 
             Firestore.instance.runTransaction((Transaction transaction) async {
-
-              DocumentSnapshot roomSnapshot = await transaction.get(documentReference);
-              if(roomSnapshot.exists) {
+              DocumentSnapshot roomSnapshot =
+                  await transaction.get(documentReference);
+              if (roomSnapshot.exists) {
                 print('Room Exists');
               } else {
                 await transaction.set(
-                documentReference,
-                {
-                  'serviceProvider': email,
-                  'serviceProviderUid': user.uid,
-                  'serviceProviderDisplayName': user.displayName,
-                  'serviceProviderPhotoUrl': user.photoUrl,
-                  'requester': widget.request.requesterEmail,
-                  'requesterDisplayName': widget.request.requesterDisplayName,
-                  'requesterPhotoUrl': widget.request.requesterPhotoUrl,
-                  'requestDocId': widget.request.docId,
-                  'requestCategory': widget.request.category,
-                  'requestCompensation': widget.request.compensation,
-                  'requesterUid': widget.request.requesterUid
-                  // 'created': DateTime.now().millisecondsSinceEpoch.toString()
-                },
-              );
+                  documentReference,
+                  {
+                    'serviceProvider': email,
+                    'serviceProviderUid': user.uid,
+                    'serviceProviderDisplayName': user.displayName,
+                    'serviceProviderPhotoUrl': user.photoUrl,
+                    'requester': widget.request.requesterEmail,
+                    'requesterDisplayName': widget.request.requesterDisplayName,
+                    'requesterPhotoUrl': widget.request.requesterPhotoUrl,
+                    'requestDocId': widget.request.docId,
+                    'requestCategory': widget.request.category,
+                    'requestCompensation': widget.request.compensation,
+                    'requesterUid': widget.request.requesterUid
+                    // 'created': DateTime.now().millisecondsSinceEpoch.toString()
+                  },
+                );
               }
-              
             });
             Navigator.push(
                 context,

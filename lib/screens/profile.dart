@@ -102,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                PublicProfileScreen(user: user)));
+                                PublicProfileChatScreen(userUid: user.uid)));
                   },
                 ),
                 SettingsTile(
