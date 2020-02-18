@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:trustworky_flutterfire/services/services.dart';
 import 'package:provider/provider.dart';
-import 'package:trustworky_flutterfire/shared/shared.dart';
 
 class RequestScreen extends StatefulWidget {
+  final String category;
+
+  RequestScreen({Key key, @required this.category}) : super(key: key);
   @override
   _RequestScreenState createState() => _RequestScreenState();
 }
@@ -13,7 +15,7 @@ class _RequestScreenState extends State<RequestScreen> {
   final _formKey = GlobalKey<FormState>();
   RequestService req = RequestService();
 
-  String category = '';
+  // String formCategory = '';
   String location = '';
   String compensation = '';
   String description = '';
@@ -24,8 +26,11 @@ class _RequestScreenState extends State<RequestScreen> {
     FirebaseUser user = Provider.of<FirebaseUser>(context);
     return Scaffold(
         appBar: AppBar(
+          iconTheme: IconThemeData(
+            color: Colors.black, //change your color here
+          ),
             title: Text(
-              'Make a Request',
+              widget.category,
               style: TextStyle(
                 fontFamily: 'ProductSans',
                 // fontWeight: FontWeight.w500,
@@ -41,70 +46,6 @@ class _RequestScreenState extends State<RequestScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          DropDownFormField(
-                            value: category,
-                            onChanged: (val) {
-                              setState(() {
-                                category = val;
-                              });
-                            },
-                            // validator: (value) {
-                            //   if (value.isEmpty) {
-                            //     return 'Please select an option';
-                            //   }
-                            //   return null;
-                            // },
-                            titleText: 'Category',
-                            dataSource: [
-                              {
-                                "display": "Electrician",
-                                "value": "Electrician",
-                              },
-                              {
-                                "display": "Air-Con",
-                                "value": "Air-Con",
-                              },
-                              {
-                                "display": "Plumber",
-                                "value": "Plumber",
-                              },
-                              {
-                                "display": "Car Mechanic",
-                                "value": "Car Mechanic",
-                              },
-                              {
-                                "display": "Locksmith",
-                                "value": "Locksmith",
-                              },
-                              {
-                                "display": "Part-Time",
-                                "value": "Part-Time",
-                              },
-                              {
-                                "display": "Freelance",
-                                "value": "Freelance",
-                              },
-                              {
-                                "display": "Cleaning",
-                                "value": "Cleaning",
-                              },
-                              {
-                                "display": "Movers",
-                                "value": "Movers",
-                              },
-                              {
-                                "display": "Delivery",
-                                "value": "Delivery",
-                              },
-                              {
-                                "display": "Others",
-                                "value": "Others",
-                              },
-                            ],
-                            textField: 'display',
-                            valueField: 'value',
-                            // autovalidate: true,
-                          ),
                           Padding(
                             padding: const EdgeInsets.only(bottom: 18.0),
                           ),
@@ -226,7 +167,7 @@ class _RequestScreenState extends State<RequestScreen> {
                                   dynamic requestFormData =
                                       await req.updateRequestData(
                                           user,
-                                          category,
+                                          widget.category,
                                           location,
                                           compensation,
                                           description);
@@ -239,8 +180,8 @@ class _RequestScreenState extends State<RequestScreen> {
                                   Scaffold.of(context).showSnackBar(SnackBar(
                                       content:
                                           Text('Request is being processed.')));
-                                  Navigator.pushReplacementNamed(
-                                      context, '/loggedin');
+                                  Navigator.pushNamedAndRemoveUntil(
+                                      context, '/loggedin', (_) => false);
                                 }
                               },
                               color: Colors.green,

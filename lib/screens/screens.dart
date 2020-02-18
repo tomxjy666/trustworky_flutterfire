@@ -21,3 +21,7 @@ export 'publicProfile.dart';
 export 'friend_list.dart';
 export 'my_qr_code.dart';
 export 'qr_scanner.dart';
+export 'request_category.dart';
+export 'request_ss.dart';
+export 'request_technical.dart';
+export 'request_adhoc.dart';

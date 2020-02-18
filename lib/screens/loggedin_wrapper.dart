@@ -12,7 +12,7 @@ class LoggedInWrapperScreen extends StatefulWidget {
 
 class _LoggedInWrapperScreenState extends State<LoggedInWrapperScreen> {
   int _currentIndex;
-  final List<Widget> _children = [RequestScreen(), TasksScreen  (), HomeScreen(), InboxScreen(), ProfileScreen()];
+  final List<Widget> _children = [RequestCategoryScreen(), TasksScreen  (), HomeScreen(), InboxScreen(), ProfileScreen()];
 
   @override
   void initState() {
