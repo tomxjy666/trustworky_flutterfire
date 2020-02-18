@@ -207,11 +207,12 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                       .collection('users')
                                       .document(widget.userUid)
                                       .collection('friends')
-                                      .where("friendUid", isEqualTo: uid)
+                                      .where("friendUid", isEqualTo: userData['uid'])
                                       .snapshots(),
                                   builder: (context, snapshot) {
                                     if (!snapshot.hasData) {
                                       print('snapShot no data');
+                                     
                                       // setState(() {_isFriendRequestButtonVisible = true;});
                                       // _isFriendRequestButtonVisible = true;
                                       return Center(
@@ -223,6 +224,13 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                       // print(
                                       //     snapshot.data.documents.length == 0);
                                       // print(uid);
+                                      readLocal();
+                                      print(snapshot.data.documents.length);
+                                      print(uid);
+                                      
+                                      if(widget.userUid == uid) {
+                                        _isFriendRequestButtonVisible = false;
+                                      }
                                       if (snapshot.data.documents.length == 0) {
                                         _isFriendRequestButtonVisible = true;
                                       }
