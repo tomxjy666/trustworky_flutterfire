@@ -61,7 +61,7 @@ class _ChatScreenState extends State<ChatScreen> {
   String error = '';
   String negoPrice = '';
   String review = '';
-  double rating = 3.0;
+  double rating = 5.0;
 
   var listMessage;
   var listedPrice;
@@ -565,520 +565,527 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: ChatBar(
-        onprofileimagetap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      PublicProfileChatScreen(userUid: widget.requesterUid)));
-        },
-        color: Colors.green,
-        profilePic: widget.requesterAvatar,
-        username: widget.requesterDisplayName,
-        lastseen: '',
-        status: ChatBarState.LASTSEEN,
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              print('changed visibility');
-              setState(() {
-                _isVisible = !_isVisible;
-              });
+    return StreamBuilder(
+      stream: Firestore.instance
+                                .collection('users')
+                                .document(widget.requesterUid)
+                                .snapshots(),
+      builder: (context, snapshot) {
+        return Scaffold(
+          key: _scaffoldKey,
+          appBar: ChatBar(
+            onprofileimagetap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          PublicProfileChatScreen(userUid: widget.requesterUid)));
             },
-            icon: Icon(Icons.info_outline),
-            color: Colors.white,
-            splashColor: Colors.blue,
+            color: Colors.green,
+            profilePic: widget.requesterAvatar,
+            username: widget.requesterDisplayName,
+            status: snapshot.data['status'] == 'online' ? ChatBarState.ONLINE : ChatBarState.OFFLINE,
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  print('changed visibility');
+                  setState(() {
+                    _isVisible = !_isVisible;
+                  });
+                },
+                icon: Icon(Icons.info_outline),
+                color: Colors.white,
+                splashColor: Colors.blue,
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            Visibility(
-              visible: _isVisible,
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(3), // if you need this
-                  side: BorderSide(
-                    color: Colors.grey.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: groupChatId == ''
-                    ? Center(
-                        child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.green)))
-                    : StreamBuilder(
-                        stream: Firestore.instance
-                            .collection('rooms')
-                            .document(groupChatId)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Center(
-                                child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.green)));
-                          } else {
-                            roomData = snapshot.data;
-                            if (roomData['jobStatus'] == null) {
-                              jobStatus = 'open';
-                            } else {
-                              jobStatus = roomData['jobStatus'];
-                            }
-                            if (roomData['jobStatus'] == 'pending') {
-                              _isAcceptButtonVisible = false;
-                              _isNegoButtonVisible = false;
-                              _isWorkDoneButtonVisible = true;
-                            }
-                            if (roomData['jobStatus'] == 'workDone') {
-                              _isWorkDoneButtonVisible = false;
-                            }
-                            if (roomData['jobStatus'] == 'negotiating') {
-                              _isAcceptButtonVisible = false;
-                              _isNegoButtonVisible = false;
-                            }
-                            if (roomData['jobStatus'] == 'open') {
-                              _isAcceptButtonVisible = true;
-                              _isNegoButtonVisible = true;
-                            }
-                            if (roomData['jobStatus'] == 'paid' && roomData['reviewServiceProvider'] == null) {
-                              _isReviewButtonVisible = true;
-                              _isAcceptButtonVisible = false;
-                              _isNegoButtonVisible = false;
-                            }
-                            if (roomData['jobStatus'] == 'paid' && roomData['reviewServiceProvider'] == true) {
-                              _isReviewButtonVisible = false;
-                              _isAcceptButtonVisible = false;
-                              _isNegoButtonVisible = false;
-                              _isWorkDoneButtonVisible = false;
-                            }
-                            // if (roomData['negoPrice'] == null) {
-                            //   listedPrice = widget.requestCompensation;
-                            // } else {
-                            //   listedPrice = roomData['negoPrice'];
-                            // }
-                          }
+          body: Container(
+            child: Column(
+              children: <Widget>[
+                Visibility(
+                  visible: _isVisible,
+                  child: Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3), // if you need this
+                      side: BorderSide(
+                        color: Colors.grey.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: groupChatId == ''
+                        ? Center(
+                            child: CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.green)))
+                        : StreamBuilder(
+                            stream: Firestore.instance
+                                .collection('rooms')
+                                .document(groupChatId)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Center(
+                                    child: CircularProgressIndicator(
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                            Colors.green)));
+                              } else {
+                                roomData = snapshot.data;
+                                if (roomData['jobStatus'] == null) {
+                                  jobStatus = 'open';
+                                } else {
+                                  jobStatus = roomData['jobStatus'];
+                                }
+                                if (roomData['jobStatus'] == 'pending') {
+                                  _isAcceptButtonVisible = false;
+                                  _isNegoButtonVisible = false;
+                                  _isWorkDoneButtonVisible = true;
+                                }
+                                if (roomData['jobStatus'] == 'workDone') {
+                                  _isWorkDoneButtonVisible = false;
+                                }
+                                if (roomData['jobStatus'] == 'negotiating') {
+                                  _isAcceptButtonVisible = false;
+                                  _isNegoButtonVisible = false;
+                                }
+                                if (roomData['jobStatus'] == 'open') {
+                                  _isAcceptButtonVisible = true;
+                                  _isNegoButtonVisible = true;
+                                }
+                                if (roomData['jobStatus'] == 'paid' && roomData['reviewServiceProvider'] == null) {
+                                  _isReviewButtonVisible = true;
+                                  _isAcceptButtonVisible = false;
+                                  _isNegoButtonVisible = false;
+                                }
+                                if (roomData['jobStatus'] == 'paid' && roomData['reviewServiceProvider'] == true) {
+                                  _isReviewButtonVisible = false;
+                                  _isAcceptButtonVisible = false;
+                                  _isNegoButtonVisible = false;
+                                  _isWorkDoneButtonVisible = false;
+                                }
+                                // if (roomData['negoPrice'] == null) {
+                                //   listedPrice = widget.requestCompensation;
+                                // } else {
+                                //   listedPrice = roomData['negoPrice'];
+                                // }
+                              }
 
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              ListTile(
-                                leading: Chip(
-                                  label: Text(jobStatus),
-                                ),
-                                title: Text(
-                                    '${widget.requestCategory} @ ${widget.requestLocation}'),
-                                subtitle: Text(widget.requestDescription),
-                                trailing: Text(
-                                  'S\$${widget.requestCompensation}',
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                              ),
-                              ButtonBar(
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  Visibility(
-                                    visible: _isNegoButtonVisible,
-                                    child: FlatButton(
-                                      child: const Text('NEGOTIATE'),
-                                      onPressed: () {
-                                        /* ... */
-                                        showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                  title:
-                                                      Text('Negotiate Price'),
-                                                  content: Form(
-                                                    key: _formKey,
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.min,
-                                                      children: <Widget>[
-                                                        Padding(
-                                                          padding:
-                                                              EdgeInsets.all(
-                                                                  8.0),
-                                                          child: TextFormField(
-                                                            onChanged: (val) {
+                                  ListTile(
+                                    leading: Chip(
+                                      label: Text(jobStatus),
+                                    ),
+                                    title: Text(
+                                        '${widget.requestCategory} @ ${widget.requestLocation}'),
+                                    subtitle: Text(widget.requestDescription),
+                                    trailing: Text(
+                                      'S\$${widget.requestCompensation}',
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                  ),
+                                  ButtonBar(
+                                    children: <Widget>[
+                                      Visibility(
+                                        visible: _isNegoButtonVisible,
+                                        child: FlatButton(
+                                          child: const Text('NEGOTIATE'),
+                                          onPressed: () {
+                                            /* ... */
+                                            showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                      title:
+                                                          Text('Negotiate Price'),
+                                                      content: Form(
+                                                        key: _formKey,
+                                                        child: Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: <Widget>[
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsets.all(
+                                                                      8.0),
+                                                              child: TextFormField(
+                                                                onChanged: (val) {
+                                                                  setState(() {
+                                                                    negoPrice = val;
+                                                                  });
+                                                                },
+                                                                keyboardType:
+                                                                    TextInputType
+                                                                        .number,
+                                                                cursorColor:
+                                                                    Colors.green,
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                        prefixText:
+                                                                            'S\$',
+                                                                        // hintText: 'S\$',
+                                                                        hintStyle: TextStyle(
+                                                                            color: Colors
+                                                                                .grey),
+                                                                        focusColor:
+                                                                            Colors
+                                                                                .green,
+                                                                        fillColor:
+                                                                            Colors
+                                                                                .green,
+                                                                        hoverColor:
+                                                                            Colors
+                                                                                .green,
+                                                                        enabledBorder: OutlineInputBorder(
+                                                                            borderSide: BorderSide(
+                                                                                color: Colors.green[
+                                                                                    200])),
+                                                                        focusedBorder: OutlineInputBorder(
+                                                                            borderSide: BorderSide(
+                                                                                color: Colors.green[
+                                                                                    100])),
+                                                                        errorBorder: OutlineInputBorder(
+                                                                            borderSide: BorderSide(
+                                                                                color: Colors.red[
+                                                                                    700])),
+                                                                        labelText:
+                                                                            'New Offer',
+                                                                        labelStyle:
+                                                                            TextStyle(color: Colors.grey[700])),
+                                                                validator: (value) {
+                                                                  if (value
+                                                                      .isEmpty) {
+                                                                    return 'Please input new offer';
+                                                                  }
+                                                                  return null;
+                                                                },
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
+                                                              child: RaisedButton(
+                                                                child: Text(
+                                                                  "SUBMIT",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600),
+                                                                ),
+                                                                onPressed:
+                                                                    () async {
+                                                                  // Validate returns true if the form is valid, or false
+                                                                  // otherwise.
+                                                                  if (_formKey
+                                                                      .currentState
+                                                                      .validate()) {
+                                                                    _formKey
+                                                                        .currentState
+                                                                        .save();
+
+                                                                    var documentReference = Firestore
+                                                                        .instance
+                                                                        .collection(
+                                                                            'rooms')
+                                                                        .document(
+                                                                            groupChatId)
+                                                                        .collection(
+                                                                            'messages')
+                                                                        .document(DateTime
+                                                                                .now()
+                                                                            .millisecondsSinceEpoch
+                                                                            .toString());
+
+                                                                    Firestore
+                                                                        .instance
+                                                                        .runTransaction(
+                                                                            (transaction) async {
+                                                                      await transaction
+                                                                          .set(
+                                                                        documentReference,
+                                                                        {
+                                                                          'idFrom':
+                                                                              uid,
+                                                                          'idTo': widget
+                                                                              .requesterUid,
+                                                                          'timestamp': DateTime
+                                                                                  .now()
+                                                                              .millisecondsSinceEpoch
+                                                                              .toString(),
+                                                                          'content':
+                                                                              "MADE AN OFFER: S\$$negoPrice",
+                                                                          'type': 2
+                                                                        },
+                                                                      );
+                                                                    });
+
+                                                                    dynamic
+                                                                        requestFormData =
+                                                                        await chat.negotiatePrice(
+                                                                            groupChatId,
+                                                                            negoPrice,
+                                                                            email);
+                                                                    await chat
+                                                                        .updateNegoStatus(
+                                                                            groupChatId);
+                                                                    // If the form is valid, display a Snackbar.
+                                                                    if (requestFormData ==
+                                                                        null) {
+                                                                      setState(() {
+                                                                        error =
+                                                                            'submit fail';
+                                                                      });
+                                                                    }
+                                                                    _scaffoldKey
+                                                                        .currentState
+                                                                        .showSnackBar(
+                                                                            SnackBar(
+                                                                      behavior:
+                                                                          SnackBarBehavior
+                                                                              .floating,
+                                                                      content: Text(
+                                                                          'New offer submitted.'),
+                                                                    ));
+                                                                    Navigator.of(
+                                                                            context,
+                                                                            rootNavigator:
+                                                                                true)
+                                                                        .pop(true);
+                                                                  }
+                                                                },
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ));
+                                                });
+                                          },
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: _isReviewButtonVisible,
+                                        child: MaterialButton(
+                                          color: Colors.green,
+                                          child: const Text('LEAVE REVIEW'),
+                                          onPressed: () async {
+                                            showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: Text(
+                                                        "Please write a review"),
+                                                    content: Form(
+                                                      key: _formKey,
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: <Widget>[
+                                                          RatingBar(
+                                                            initialRating: 5,
+                                                            minRating: 1,
+                                                            direction:
+                                                                Axis.horizontal,
+                                                            allowHalfRating: true,
+                                                            itemCount: 5,
+                                                            itemPadding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        4.0),
+                                                            itemBuilder:
+                                                                (context, _) =>
+                                                                    Icon(
+                                                              Icons.star,
+                                                              color: Colors.amber,
+                                                            ),
+                                                            onRatingUpdate: (val) {
+                                                              print(val);
                                                               setState(() {
-                                                                negoPrice = val;
+                                                                rating = val;
                                                               });
                                                             },
-                                                            keyboardType:
-                                                                TextInputType
-                                                                    .number,
-                                                            cursorColor:
-                                                                Colors.green,
-                                                            decoration:
-                                                                InputDecoration(
-                                                                    prefixText:
-                                                                        'S\$',
-                                                                    // hintText: 'S\$',
-                                                                    hintStyle: TextStyle(
-                                                                        color: Colors
-                                                                            .grey),
-                                                                    focusColor:
-                                                                        Colors
-                                                                            .green,
-                                                                    fillColor:
-                                                                        Colors
-                                                                            .green,
-                                                                    hoverColor:
-                                                                        Colors
-                                                                            .green,
-                                                                    enabledBorder: OutlineInputBorder(
-                                                                        borderSide: BorderSide(
-                                                                            color: Colors.green[
-                                                                                200])),
-                                                                    focusedBorder: OutlineInputBorder(
-                                                                        borderSide: BorderSide(
-                                                                            color: Colors.green[
-                                                                                100])),
-                                                                    errorBorder: OutlineInputBorder(
-                                                                        borderSide: BorderSide(
-                                                                            color: Colors.red[
-                                                                                700])),
-                                                                    labelText:
-                                                                        'New Offer',
-                                                                    labelStyle:
-                                                                        TextStyle(color: Colors.grey[700])),
-                                                            validator: (value) {
-                                                              if (value
-                                                                  .isEmpty) {
-                                                                return 'Please input new offer';
-                                                              }
-                                                              return null;
-                                                            },
                                                           ),
-                                                        ),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
-                                                          child: RaisedButton(
-                                                            child: Text(
-                                                              "SUBMIT",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600),
-                                                            ),
-                                                            onPressed:
-                                                                () async {
-                                                              // Validate returns true if the form is valid, or false
-                                                              // otherwise.
-                                                              if (_formKey
-                                                                  .currentState
-                                                                  .validate()) {
-                                                                _formKey
-                                                                    .currentState
-                                                                    .save();
-
-                                                                var documentReference = Firestore
-                                                                    .instance
-                                                                    .collection(
-                                                                        'rooms')
-                                                                    .document(
-                                                                        groupChatId)
-                                                                    .collection(
-                                                                        'messages')
-                                                                    .document(DateTime
-                                                                            .now()
-                                                                        .millisecondsSinceEpoch
-                                                                        .toString());
-
-                                                                Firestore
-                                                                    .instance
-                                                                    .runTransaction(
-                                                                        (transaction) async {
-                                                                  await transaction
-                                                                      .set(
-                                                                    documentReference,
-                                                                    {
-                                                                      'idFrom':
-                                                                          uid,
-                                                                      'idTo': widget
-                                                                          .requesterUid,
-                                                                      'timestamp': DateTime
-                                                                              .now()
-                                                                          .millisecondsSinceEpoch
-                                                                          .toString(),
-                                                                      'content':
-                                                                          "MADE AN OFFER: S\$$negoPrice",
-                                                                      'type': 2
-                                                                    },
-                                                                  );
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsets.all(8.0),
+                                                            child: TextFormField(
+                                                              minLines: 3,
+                                                              maxLines: 6,
+                                                              onChanged: (val) {
+                                                                setState(() {
+                                                                  review = val;
                                                                 });
-
-                                                                dynamic
-                                                                    requestFormData =
-                                                                    await chat.negotiatePrice(
-                                                                        groupChatId,
-                                                                        negoPrice,
-                                                                        email);
-                                                                await chat
-                                                                    .updateNegoStatus(
-                                                                        groupChatId);
-                                                                // If the form is valid, display a Snackbar.
-                                                                if (requestFormData ==
-                                                                    null) {
-                                                                  setState(() {
-                                                                    error =
-                                                                        'submit fail';
-                                                                  });
+                                                              },
+                                                              cursorColor:
+                                                                  Colors.green,
+                                                              decoration: InputDecoration(
+                                                                  hintText:
+                                                                      'Write something...',
+                                                                  hintStyle: TextStyle(
+                                                                      color: Colors
+                                                                          .grey),
+                                                                  focusColor:
+                                                                      Colors.green,
+                                                                  fillColor:
+                                                                      Colors.green,
+                                                                  hoverColor:
+                                                                      Colors.green,
+                                                                  enabledBorder: OutlineInputBorder(
+                                                                      borderSide: BorderSide(
+                                                                          color: Colors.green[
+                                                                              200])),
+                                                                  focusedBorder: OutlineInputBorder(
+                                                                      borderSide: BorderSide(
+                                                                          color: Colors.green[
+                                                                              100])),
+                                                                  errorBorder: OutlineInputBorder(
+                                                                      borderSide: BorderSide(
+                                                                          color: Colors.red[
+                                                                              700])),
+                                                                  labelStyle: TextStyle(
+                                                                      color: Colors.grey[700])),
+                                                              validator: (value) {
+                                                                if (value.isEmpty) {
+                                                                  return 'Please leave a review';
                                                                 }
-                                                                _scaffoldKey
-                                                                    .currentState
-                                                                    .showSnackBar(
-                                                                        SnackBar(
-                                                                  behavior:
-                                                                      SnackBarBehavior
-                                                                          .floating,
-                                                                  content: Text(
-                                                                      'New offer submitted.'),
-                                                                ));
-                                                                Navigator.of(
-                                                                        context,
-                                                                        rootNavigator:
-                                                                            true)
-                                                                    .pop(true);
-                                                              }
-                                                            },
-                                                          ),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ));
-                                            });
-                                      },
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: _isReviewButtonVisible,
-                                    child: MaterialButton(
-                                      color: Colors.green,
-                                      child: const Text('LEAVE REVIEW'),
-                                      onPressed: () async {
-                                        showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: Text(
-                                                    "Please write a review"),
-                                                content: Form(
-                                                  key: _formKey,
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: <Widget>[
-                                                      RatingBar(
-                                                        initialRating: 5,
-                                                        minRating: 1,
-                                                        direction:
-                                                            Axis.horizontal,
-                                                        allowHalfRating: true,
-                                                        itemCount: 5,
-                                                        itemPadding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal:
-                                                                    4.0),
-                                                        itemBuilder:
-                                                            (context, _) =>
-                                                                Icon(
-                                                          Icons.star,
-                                                          color: Colors.amber,
-                                                        ),
-                                                        onRatingUpdate: (val) {
-                                                          print(val);
-                                                          setState(() {
-                                                            rating = val;
-                                                          });
-                                                        },
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.all(8.0),
-                                                        child: TextFormField(
-                                                          minLines: 3,
-                                                          maxLines: 6,
-                                                          onChanged: (val) {
-                                                            setState(() {
-                                                              review = val;
-                                                            });
-                                                          },
-                                                          cursorColor:
-                                                              Colors.green,
-                                                          decoration: InputDecoration(
-                                                              hintText:
-                                                                  'Write something...',
-                                                              hintStyle: TextStyle(
-                                                                  color: Colors
-                                                                      .grey),
-                                                              focusColor:
-                                                                  Colors.green,
-                                                              fillColor:
-                                                                  Colors.green,
-                                                              hoverColor:
-                                                                  Colors.green,
-                                                              enabledBorder: OutlineInputBorder(
-                                                                  borderSide: BorderSide(
-                                                                      color: Colors.green[
-                                                                          200])),
-                                                              focusedBorder: OutlineInputBorder(
-                                                                  borderSide: BorderSide(
-                                                                      color: Colors.green[
-                                                                          100])),
-                                                              errorBorder: OutlineInputBorder(
-                                                                  borderSide: BorderSide(
-                                                                      color: Colors.red[
-                                                                          700])),
-                                                              labelStyle: TextStyle(
-                                                                  color: Colors.grey[700])),
-                                                          validator: (value) {
-                                                            if (value.isEmpty) {
-                                                              return 'Please leave a review';
-                                                            }
-                                                            return null;
-                                                          },
-                                                        ),
-                                                      ),
-                                                       Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
-                                                                  child: RaisedButton(
-                                                                    child: Text(
-                                                              "SUBMIT",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600),
+                                                                return null;
+                                                              },
                                                             ),
-                                                                    onPressed: () async {
-                                                                      if (_formKey
-                                                                  .currentState
-                                                                  .validate()) {
-                                                                _formKey
-                                                                    .currentState
-                                                                    .save();
-                                                                    dynamic
-                                                                    ratingFormData =
-                                                                    await chat.leaveReview(
-                                                                        widget.requesterUid,
-                                                                        rating,
-                                                                        review,
-                                                                        roomData['serviceProviderDisplayName'],
-                                                                        roomData['serviceProviderPhotoUrl']
-                                                                        );
-                                                                        await chat.reviewStatusServiceProvider(groupChatId);
-                                                              
-                                                                // If the form is valid, display a Snackbar.
-                                                                if (ratingFormData ==
-                                                                    null) {
-                                                                  setState(() {
-                                                                    error =
-                                                                        'submit fail';
-                                                                  });
-                                                                }
-                                                                _scaffoldKey
-                                                                    .currentState
-                                                                    .showSnackBar(
-                                                                        SnackBar(
-                                                                  behavior:
-                                                                      SnackBarBehavior
-                                                                          .floating,
-                                                                  content: Text(
-                                                                      'Review submitted.'),
-                                                                ));
-                                                                Navigator.of(
-                                                                        context,
-                                                                        rootNavigator:
-                                                                            true)
-                                                                    .pop(true);
-
+                                                          ),
+                                                           Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
+                                                                      child: RaisedButton(
+                                                                        child: Text(
+                                                                  "SUBMIT",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600),
+                                                                ),
+                                                                        onPressed: () async {
+                                                                          if (_formKey
+                                                                      .currentState
+                                                                      .validate()) {
+                                                                    _formKey
+                                                                        .currentState
+                                                                        .save();
+                                                                        dynamic
+                                                                        ratingFormData =
+                                                                        await chat.leaveReview(
+                                                                            widget.requesterUid,
+                                                                            rating,
+                                                                            review,
+                                                                            roomData['serviceProviderDisplayName'],
+                                                                            roomData['serviceProviderPhotoUrl']
+                                                                            );
+                                                                            await chat.reviewStatusServiceProvider(groupChatId);
+                                                                  
+                                                                    // If the form is valid, display a Snackbar.
+                                                                    if (ratingFormData ==
+                                                                        null) {
+                                                                      setState(() {
+                                                                        error =
+                                                                            'submit fail';
+                                                                      });
                                                                     }
-                                                                    },
-                                                                  ))
-                                                    ],
-                                                  ),
-                                                ),
+                                                                    _scaffoldKey
+                                                                        .currentState
+                                                                        .showSnackBar(
+                                                                            SnackBar(
+                                                                      behavior:
+                                                                          SnackBarBehavior
+                                                                              .floating,
+                                                                      content: Text(
+                                                                          'Review submitted.'),
+                                                                    ));
+                                                                    Navigator.of(
+                                                                            context,
+                                                                            rootNavigator:
+                                                                                true)
+                                                                        .pop(true);
+
+                                                                        }
+                                                                        },
+                                                                      ))
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                });
+                                          },
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: _isWorkDoneButtonVisible,
+                                        child: MaterialButton(
+                                          color: Colors.green,
+                                          child: const Text('CONFIRM WORK DONE'),
+                                          onPressed: () async {
+                                            await chat
+                                                .updateWorkDoneStatus(groupChatId);
+                                          },
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: _isAcceptButtonVisible,
+                                        child: MaterialButton(
+                                          color: Colors.green,
+                                          child: const Text('ACCEPT'),
+                                          onPressed: () async {
+                                            var documentReference = Firestore
+                                                .instance
+                                                .collection('rooms')
+                                                .document(groupChatId)
+                                                .collection('messages')
+                                                .document(DateTime.now()
+                                                    .millisecondsSinceEpoch
+                                                    .toString());
+
+                                            Firestore.instance.runTransaction(
+                                                (transaction) async {
+                                              await transaction.set(
+                                                documentReference,
+                                                {
+                                                  'idFrom': uid,
+                                                  'idTo': widget.requesterUid,
+                                                  'timestamp': DateTime.now()
+                                                      .millisecondsSinceEpoch
+                                                      .toString(),
+                                                  'content':
+                                                      "ACCEPTED LISTED RATE: S\$${widget.requestCompensation}",
+                                                  'type': 2
+                                                },
                                               );
                                             });
-                                      },
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: _isWorkDoneButtonVisible,
-                                    child: MaterialButton(
-                                      color: Colors.green,
-                                      child: const Text('CONFIRM WORK DONE'),
-                                      onPressed: () async {
-                                        await chat
-                                            .updateWorkDoneStatus(groupChatId);
-                                      },
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: _isAcceptButtonVisible,
-                                    child: MaterialButton(
-                                      color: Colors.green,
-                                      child: const Text('ACCEPT'),
-                                      onPressed: () async {
-                                        var documentReference = Firestore
-                                            .instance
-                                            .collection('rooms')
-                                            .document(groupChatId)
-                                            .collection('messages')
-                                            .document(DateTime.now()
-                                                .millisecondsSinceEpoch
-                                                .toString());
 
-                                        Firestore.instance.runTransaction(
-                                            (transaction) async {
-                                          await transaction.set(
-                                            documentReference,
-                                            {
-                                              'idFrom': uid,
-                                              'idTo': widget.requesterUid,
-                                              'timestamp': DateTime.now()
-                                                  .millisecondsSinceEpoch
-                                                  .toString(),
-                                              'content':
-                                                  "ACCEPTED LISTED RATE: S\$${widget.requestCompensation}",
-                                              'type': 2
-                                            },
-                                          );
-                                        });
-
-                                        await req
-                                            .updateRequestStatus(widget.docId);
-                                        await chat.acceptListedRate(groupChatId,
-                                            widget.requestCompensation);
-                                      },
-                                    ),
+                                            await req
+                                                .updateRequestStatus(widget.docId);
+                                            await chat.acceptListedRate(groupChatId,
+                                                widget.requestCompensation);
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
-                              ),
-                            ],
-                          );
-                        }),
-              ),
+                              );
+                            }),
+                  ),
+                ),
+                buildListMessage(),
+                buildInput(),
+              ],
             ),
-            buildListMessage(),
-            buildInput(),
-          ],
-        ),
-      ),
+          ),
+        );
+      }
     );
   }
 }

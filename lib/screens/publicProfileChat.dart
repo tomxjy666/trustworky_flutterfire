@@ -212,27 +212,21 @@ class _PublicProfileChatScreenState extends State<PublicProfileChatScreen> {
                                   builder: (context, snapshot) {
                                     if (!snapshot.hasData) {
                                       print('snapShot no data');
-                                     
-                                      // setState(() {_isFriendRequestButtonVisible = true;});
-                                      // _isFriendRequestButtonVisible = true;
                                       return Center(
                                           child: CircularProgressIndicator(
                                               valueColor:
                                                   AlwaysStoppedAnimation<Color>(
                                                       Colors.green)));
                                     } else {
-                                      // print(
-                                      //     snapshot.data.documents.length == 0);
-                                      // print(uid);
                                       readLocal();
                                       print(snapshot.data.documents.length);
                                       print(uid);
                                       
-                                      if(widget.userUid == uid) {
-                                        _isFriendRequestButtonVisible = false;
-                                      }
                                       if (snapshot.data.documents.length == 0) {
                                         _isFriendRequestButtonVisible = true;
+                                      }
+                                      if(widget.userUid == uid) {
+                                        _isFriendRequestButtonVisible = false;
                                       }
                                       return Visibility(
                                         visible: _isFriendRequestButtonVisible,

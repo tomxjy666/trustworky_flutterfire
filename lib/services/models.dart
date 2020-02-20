@@ -161,9 +161,10 @@ class User {
   String phoneNumber;
   String displayName;
   String photoUrl;
+  String status;
   DateTime lastActivity;
 
-  User({this.uid, this.email,this.emailVerified,this.phoneNumber, this.displayName, this.photoUrl, this.lastActivity});
+  User({this.uid, this.email,this.emailVerified,this.phoneNumber, this.displayName, this.photoUrl, this.status, this.lastActivity});
 
   factory User.fromMap(Map data) {
     return User(
@@ -173,6 +174,7 @@ class User {
         phoneNumber: data['phoneNumber'] ?? '',
         displayName: data['displayName'] ?? '',
         photoUrl: data['photoUrl'] ?? '',
+        status: data['status'] ?? '',
         lastActivity: data['lastActivity']);
   }
 }

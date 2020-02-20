@@ -569,470 +569,477 @@ class _ChatInboxScreenState extends State<ChatInboxScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: ChatBar(
-        onprofileimagetap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      PublicProfileChatScreen(userUid: widget.serviceProviderUid)));
-        },
-        color: Colors.green,
-        profilePic: widget.serviceProviderPhotoUrl,
-        username: widget.serviceProviderDisplayName,
-        lastseen: '',
-        status: ChatBarState.LASTSEEN,
-        actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              print('changed visibility');
-              setState(() {
-                _isVisible = !_isVisible;
-              });
+    return StreamBuilder(
+      stream: Firestore.instance
+                                .collection('users')
+                                .document(widget.serviceProviderUid)
+                                .snapshots(),
+      builder: (context, snapshot) {
+        return Scaffold(
+          key: _scaffoldKey,
+          appBar: ChatBar(
+            onprofileimagetap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          PublicProfileChatScreen(userUid: widget.serviceProviderUid)));
             },
-            icon: Icon(Icons.info_outline),
-            color: Colors.white,
-            splashColor: Colors.blue,
+            color: Colors.green,
+            profilePic: widget.serviceProviderPhotoUrl,
+            username: widget.serviceProviderDisplayName,
+            status: snapshot.data['status'] == 'online' ? ChatBarState.ONLINE : ChatBarState.OFFLINE,
+            actions: <Widget>[
+              IconButton(
+                onPressed: () {
+                  print('changed visibility');
+                  setState(() {
+                    _isVisible = !_isVisible;
+                  });
+                },
+                icon: Icon(Icons.info_outline),
+                color: Colors.white,
+                splashColor: Colors.blue,
+              ),
+            ],
           ),
-        ],
-      ),
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            Visibility(
-              visible: _isVisible,
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(3), // if you need this
-                  side: BorderSide(
-                    color: Colors.grey.withOpacity(0.3),
-                    width: 1,
-                  ),
-                ),
-                child: groupChatId == ''
-                    ? Center(
-                        child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.green)))
-                    : StreamBuilder(
-                        stream: Firestore.instance
-                            .collection('rooms')
-                            .document(groupChatId)
-                            .snapshots(),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return Center(
-                                child: CircularProgressIndicator(
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.green)));
-                          } else {
-                            roomData = snapshot.data;
+          body: Container(
+            child: Column(
+              children: <Widget>[
+                Visibility(
+                  visible: _isVisible,
+                  child: Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3), // if you need this
+                      side: BorderSide(
+                        color: Colors.grey.withOpacity(0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: groupChatId == ''
+                        ? Center(
+                            child: CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(Colors.green)))
+                        : StreamBuilder(
+                            stream: Firestore.instance
+                                .collection('rooms')
+                                .document(groupChatId)
+                                .snapshots(),
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Center(
+                                    child: CircularProgressIndicator(
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                            Colors.green)));
+                              } else {
+                                roomData = snapshot.data;
 
-                            if (roomData['jobStatus'] == null) {
-                              jobStatus = 'open';
-                            } else {
-                              jobStatus = roomData['jobStatus'];
-                            }
+                                if (roomData['jobStatus'] == null) {
+                                  jobStatus = 'open';
+                                } else {
+                                  jobStatus = roomData['jobStatus'];
+                                }
 
-                            if (roomData['jobStatus'] == 'workDone') {
-                              _isConfirmWorkDoneButtonVisible = true;
-                            }
-                            if (roomData['jobStatus'] == 'paid') {
-                              _isConfirmWorkDoneButtonVisible = false;
-                            }
-                            if (roomData['jobStatus'] == 'negotiating') {
-                              _isDeclineOfferButtonVisible = true;
-                              _isAcceptOfferButtonVisible = true;
-                            }
-                            if (roomData['jobStatus'] == 'pending') {
-                              _isDeclineOfferButtonVisible = false;
-                              _isAcceptOfferButtonVisible = false;
-                            }
-                            if (roomData['jobStatus'] == 'open') {
-                              _isDeclineOfferButtonVisible = false;
-                              _isAcceptOfferButtonVisible = false;
-                            }
-                            if (roomData['jobStatus'] == 'paid' &&
-                                roomData['reviewRequester'] == null) {
-                              _isReviewButtonVisible = true;
-                              _isConfirmWorkDoneButtonVisible = false;
-                              _isAcceptOfferButtonVisible = false;
-                              _isDeclineOfferButtonVisible = false;
-                            }
-                            if (roomData['jobStatus'] == 'paid' &&
-                                roomData['reviewRequester'] == true) {
-                              _isReviewButtonVisible = false;
-                              _isConfirmWorkDoneButtonVisible = false;
-                              _isAcceptOfferButtonVisible = false;
-                              _isDeclineOfferButtonVisible = false;
-                            }
-                          }
+                                if (roomData['jobStatus'] == 'workDone') {
+                                  _isConfirmWorkDoneButtonVisible = true;
+                                }
+                                if (roomData['jobStatus'] == 'paid') {
+                                  _isConfirmWorkDoneButtonVisible = false;
+                                }
+                                if (roomData['jobStatus'] == 'negotiating') {
+                                  _isDeclineOfferButtonVisible = true;
+                                  _isAcceptOfferButtonVisible = true;
+                                }
+                                if (roomData['jobStatus'] == 'pending') {
+                                  _isDeclineOfferButtonVisible = false;
+                                  _isAcceptOfferButtonVisible = false;
+                                }
+                                if (roomData['jobStatus'] == 'open') {
+                                  _isDeclineOfferButtonVisible = false;
+                                  _isAcceptOfferButtonVisible = false;
+                                }
+                                if (roomData['jobStatus'] == 'paid' &&
+                                    roomData['reviewRequester'] == null) {
+                                  _isReviewButtonVisible = true;
+                                  _isConfirmWorkDoneButtonVisible = false;
+                                  _isAcceptOfferButtonVisible = false;
+                                  _isDeclineOfferButtonVisible = false;
+                                }
+                                if (roomData['jobStatus'] == 'paid' &&
+                                    roomData['reviewRequester'] == true) {
+                                  _isReviewButtonVisible = false;
+                                  _isConfirmWorkDoneButtonVisible = false;
+                                  _isAcceptOfferButtonVisible = false;
+                                  _isDeclineOfferButtonVisible = false;
+                                }
+                              }
 
-                          return Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              ListTile(
-                                leading: Chip(
-                                  // avatar: CircleAvatar(
-                                  //   backgroundColor: Colors.grey[300],
-
-                                  // ),
-                                  label: Text(jobStatus),
-                                ),
-                                title: Text(
-                                    '${widget.requestCategory} @ ${widget.requestLocation}'),
-                                subtitle: Text(widget.requestDescription),
-                                trailing: Text(
-                                  'S\$${widget.requestCompensation}',
-                                  style: TextStyle(fontSize: 18),
-                                ),
-                              ),
-                              ButtonBar(
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: <Widget>[
-                                  Visibility(
-                                    visible: _isDeclineOfferButtonVisible,
-                                    child: FlatButton(
-                                      child: const Text('DECLINE OFFER'),
-                                      onPressed: () {
-                                        showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: Text(
-                                                    'Confirm Decline Offer'),
-                                                actions: <Widget>[
-                                                  FlatButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context,
-                                                              rootNavigator:
-                                                                  true)
-                                                          .pop(true);
-                                                    },
-                                                    child: Text('CANCEL'),
-                                                  ),
-                                                  FlatButton(
-                                                    onPressed: () async {
-                                                      final String decline =
-                                                          "DECLINED OFFER: S\$";
+                                  ListTile(
+                                    leading: Chip(
+                                      // avatar: CircleAvatar(
+                                      //   backgroundColor: Colors.grey[300],
 
-                                                      var documentReference =
-                                                          Firestore.instance
-                                                              .collection(
-                                                                  'rooms')
-                                                              .document(
-                                                                  groupChatId)
-                                                              .collection(
-                                                                  'messages')
-                                                              .document(DateTime
-                                                                      .now()
-                                                                  .millisecondsSinceEpoch
-                                                                  .toString());
-
-                                                      Firestore.instance
-                                                          .runTransaction(
-                                                              (transaction) async {
-                                                        await transaction.set(
-                                                          documentReference,
-                                                          {
-                                                            'idFrom': uid,
-                                                            'idTo': widget
-                                                                .requesterUid,
-                                                            'timestamp': DateTime
-                                                                    .now()
-                                                                .millisecondsSinceEpoch
-                                                                .toString(),
-                                                            'content': decline +
-                                                                roomData[
-                                                                    'negoPrice'],
-                                                            'type': 2
-                                                          },
-                                                        );
-                                                      });
-
-                                                      await chat.declineOffer(
-                                                          groupChatId);
-                                                      Navigator.of(context,
-                                                              rootNavigator:
-                                                                  true)
-                                                          .pop(true);
-                                                    },
-                                                    child:
-                                                        Text('DECLINE OFFER'),
-                                                  )
-                                                ],
-                                              );
-                                            });
-                                      },
+                                      // ),
+                                      label: Text(jobStatus),
+                                    ),
+                                    title: Text(
+                                        '${widget.requestCategory} @ ${widget.requestLocation}'),
+                                    subtitle: Text(widget.requestDescription),
+                                    trailing: Text(
+                                      'S\$${widget.requestCompensation}',
+                                      style: TextStyle(fontSize: 18),
                                     ),
                                   ),
-                                  Visibility(
-                                    visible: _isAcceptOfferButtonVisible,
-                                    child: MaterialButton(
-                                      color: Colors.green,
-                                      child: const Text('ACCEPT OFFER'),
-                                      onPressed: () {
-                                        showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: Text(
-                                                    'Confirm Accept Offer?'),
-                                                content: Text(
-                                                    'Once you accept the Service Provider\'s offer, you\'ll be able to leave a review for each other.'),
-                                                actions: <Widget>[
-                                                  FlatButton(
-                                                    onPressed: () {
-                                                      Navigator.of(context,
-                                                              rootNavigator:
-                                                                  true)
-                                                          .pop(true);
-                                                    },
-                                                    child: Text('CANCEL'),
-                                                  ),
-                                                  FlatButton(
-                                                      onPressed: () async {
-                                                        final String accept =
-                                                            "ACCEPTED OFFER: S\$";
+                                  ButtonBar(
+                                    children: <Widget>[
+                                      Visibility(
+                                        visible: _isDeclineOfferButtonVisible,
+                                        child: FlatButton(
+                                          child: const Text('DECLINE OFFER'),
+                                          onPressed: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: Text(
+                                                        'Confirm Decline Offer'),
+                                                    actions: <Widget>[
+                                                      FlatButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context,
+                                                                  rootNavigator:
+                                                                      true)
+                                                              .pop(true);
+                                                        },
+                                                        child: Text('CANCEL'),
+                                                      ),
+                                                      FlatButton(
+                                                        onPressed: () async {
+                                                          final String decline =
+                                                              "DECLINED OFFER: S\$";
 
-                                                        var documentReference =
-                                                            Firestore.instance
-                                                                .collection(
-                                                                    'rooms')
-                                                                .document(
-                                                                    groupChatId)
-                                                                .collection(
-                                                                    'messages')
-                                                                .document(DateTime
+                                                          var documentReference =
+                                                              Firestore.instance
+                                                                  .collection(
+                                                                      'rooms')
+                                                                  .document(
+                                                                      groupChatId)
+                                                                  .collection(
+                                                                      'messages')
+                                                                  .document(DateTime
+                                                                          .now()
+                                                                      .millisecondsSinceEpoch
+                                                                      .toString());
+
+                                                          Firestore.instance
+                                                              .runTransaction(
+                                                                  (transaction) async {
+                                                            await transaction.set(
+                                                              documentReference,
+                                                              {
+                                                                'idFrom': uid,
+                                                                'idTo': widget
+                                                                    .requesterUid,
+                                                                'timestamp': DateTime
                                                                         .now()
                                                                     .millisecondsSinceEpoch
-                                                                    .toString());
-
-                                                        Firestore.instance
-                                                            .runTransaction(
-                                                                (transaction) async {
-                                                          await transaction.set(
-                                                            documentReference,
-                                                            {
-                                                              'idFrom': uid,
-                                                              'idTo': widget
-                                                                  .requesterUid,
-                                                              'timestamp': DateTime
-                                                                      .now()
-                                                                  .millisecondsSinceEpoch
-                                                                  .toString(),
-                                                              'content': accept +
-                                                                  roomData[
-                                                                      'negoPrice'],
-                                                              'type': 2
-                                                            },
-                                                          );
-                                                        });
-
-                                                        await req
-                                                            .updateRequestStatus(
-                                                                widget.docId);
-                                                        await chat.acceptOffer(
-                                                            groupChatId,
-                                                            roomData[
-                                                                'negoPrice']);
-                                                        Navigator.of(context,
-                                                                rootNavigator:
-                                                                    true)
-                                                            .pop(true);
-                                                      },
-                                                      child:
-                                                          Text('ACCEPT OFFER'))
-                                                ],
-                                              );
-                                            });
-                                      },
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: _isConfirmWorkDoneButtonVisible,
-                                    child: FlatButton(
-                                      child: const Text('CONFIRM WORK DONE'),
-                                      onPressed: () async {
-                                        await chat
-                                            .confirmWorkDoneStatus(groupChatId);
-                                      },
-                                    ),
-                                  ),
-                                  Visibility(
-                                    visible: _isReviewButtonVisible,
-                                    child: MaterialButton(
-                                      color: Colors.green,
-                                      child: const Text('LEAVE REVIEW'),
-                                      onPressed: () async {
-                                        showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return AlertDialog(
-                                                title: Text(
-                                                    "Please write a review"),
-                                                content: Form(
-                                                  key: _formKey,
-                                                  child: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: <Widget>[
-                                                      RatingBar(
-                                                        initialRating: 5,
-                                                        minRating: 1,
-                                                        direction:
-                                                            Axis.horizontal,
-                                                        allowHalfRating: true,
-                                                        itemCount: 5,
-                                                        itemPadding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal:
-                                                                    4.0),
-                                                        itemBuilder:
-                                                            (context, _) =>
-                                                                Icon(
-                                                          Icons.star,
-                                                          color: Colors.amber,
-                                                        ),
-                                                        onRatingUpdate: (val) {
-                                                          print(val);
-                                                          setState(() {
-                                                            rating = val;
+                                                                    .toString(),
+                                                                'content': decline +
+                                                                    roomData[
+                                                                        'negoPrice'],
+                                                                'type': 2
+                                                              },
+                                                            );
                                                           });
-                                                        },
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.all(8.0),
-                                                        child: TextFormField(
-                                                          minLines: 3,
-                                                          maxLines: 6,
-                                                          onChanged: (val) {
-                                                            setState(() {
-                                                              review = val;
-                                                            });
-                                                          },
-                                                          cursorColor:
-                                                              Colors.green,
-                                                          decoration: InputDecoration(
-                                                              hintText:
-                                                                  'Write something...',
-                                                              hintStyle: TextStyle(
-                                                                  color: Colors
-                                                                      .grey),
-                                                              focusColor:
-                                                                  Colors.green,
-                                                              fillColor:
-                                                                  Colors.green,
-                                                              hoverColor:
-                                                                  Colors.green,
-                                                              enabledBorder: OutlineInputBorder(
-                                                                  borderSide: BorderSide(
-                                                                      color: Colors.green[
-                                                                          200])),
-                                                              focusedBorder: OutlineInputBorder(
-                                                                  borderSide: BorderSide(
-                                                                      color: Colors.green[
-                                                                          100])),
-                                                              errorBorder: OutlineInputBorder(
-                                                                  borderSide: BorderSide(
-                                                                      color: Colors.red[
-                                                                          700])),
-                                                              labelStyle: TextStyle(
-                                                                  color: Colors.grey[700])),
-                                                          validator: (value) {
-                                                            if (value.isEmpty) {
-                                                              return 'Please leave a review';
-                                                            }
-                                                            return null;
-                                                          },
-                                                        ),
-                                                      ),
-                                                      Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(8.0),
-                                                          child: RaisedButton(
-                                                            child: Text(
-                                                              "SUBMIT",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600),
-                                                            ),
-                                                            onPressed:
-                                                                () async {
-                                                              if (_formKey
-                                                                  .currentState
-                                                                  .validate()) {
-                                                                _formKey
-                                                                    .currentState
-                                                                    .save();
-                                                                dynamic
-                                                                    ratingFormData =
-                                                                    await chat.leaveReviewRequester(
-                                                                        roomData[
-                                                                            'serviceProviderUid'],
-                                                                        rating,
-                                                                        review,
-                                                                        roomData[
-                                                                            'requesterDisplayName'],
-                                                                        roomData[
-                                                                            'requesterPhotoUrl']);
-                                                                await chat
-                                                                    .reviewStatusRequester(
-                                                                        groupChatId);
 
-                                                                // If the form is valid, display a Snackbar.
-                                                                if (ratingFormData ==
-                                                                    null) {
-                                                                  setState(() {
-                                                                    error =
-                                                                        'submit fail';
-                                                                  });
-                                                                }
-                                                                _scaffoldKey
-                                                                    .currentState
-                                                                    .showSnackBar(
-                                                                        SnackBar(
-                                                                  behavior:
-                                                                      SnackBarBehavior
-                                                                          .floating,
-                                                                  content: Text(
-                                                                      'Review submitted.'),
-                                                                ));
-                                                                Navigator.of(
-                                                                        context,
-                                                                        rootNavigator:
-                                                                            true)
-                                                                    .pop(true);
-                                                              }
-                                                            },
-                                                          ))
+                                                          await chat.declineOffer(
+                                                              groupChatId);
+                                                          Navigator.of(context,
+                                                                  rootNavigator:
+                                                                      true)
+                                                              .pop(true);
+                                                        },
+                                                        child:
+                                                            Text('DECLINE OFFER'),
+                                                      )
                                                     ],
-                                                  ),
-                                                ),
-                                              );
-                                            });
-                                      },
-                                    ),
+                                                  );
+                                                });
+                                          },
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: _isAcceptOfferButtonVisible,
+                                        child: MaterialButton(
+                                          color: Colors.green,
+                                          child: const Text('ACCEPT OFFER'),
+                                          onPressed: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: Text(
+                                                        'Confirm Accept Offer?'),
+                                                    content: Text(
+                                                        'Once you accept the Service Provider\'s offer, you\'ll be able to leave a review for each other.'),
+                                                    actions: <Widget>[
+                                                      FlatButton(
+                                                        onPressed: () {
+                                                          Navigator.of(context,
+                                                                  rootNavigator:
+                                                                      true)
+                                                              .pop(true);
+                                                        },
+                                                        child: Text('CANCEL'),
+                                                      ),
+                                                      FlatButton(
+                                                          onPressed: () async {
+                                                            final String accept =
+                                                                "ACCEPTED OFFER: S\$";
+
+                                                            var documentReference =
+                                                                Firestore.instance
+                                                                    .collection(
+                                                                        'rooms')
+                                                                    .document(
+                                                                        groupChatId)
+                                                                    .collection(
+                                                                        'messages')
+                                                                    .document(DateTime
+                                                                            .now()
+                                                                        .millisecondsSinceEpoch
+                                                                        .toString());
+
+                                                            Firestore.instance
+                                                                .runTransaction(
+                                                                    (transaction) async {
+                                                              await transaction.set(
+                                                                documentReference,
+                                                                {
+                                                                  'idFrom': uid,
+                                                                  'idTo': widget
+                                                                      .requesterUid,
+                                                                  'timestamp': DateTime
+                                                                          .now()
+                                                                      .millisecondsSinceEpoch
+                                                                      .toString(),
+                                                                  'content': accept +
+                                                                      roomData[
+                                                                          'negoPrice'],
+                                                                  'type': 2
+                                                                },
+                                                              );
+                                                            });
+
+                                                            await req
+                                                                .updateRequestStatus(
+                                                                    widget.docId);
+                                                            await chat.acceptOffer(
+                                                                groupChatId,
+                                                                roomData[
+                                                                    'negoPrice']);
+                                                            Navigator.of(context,
+                                                                    rootNavigator:
+                                                                        true)
+                                                                .pop(true);
+                                                          },
+                                                          child:
+                                                              Text('ACCEPT OFFER'))
+                                                    ],
+                                                  );
+                                                });
+                                          },
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: _isConfirmWorkDoneButtonVisible,
+                                        child: FlatButton(
+                                          child: const Text('CONFIRM WORK DONE'),
+                                          onPressed: () async {
+                                            await chat
+                                                .confirmWorkDoneStatus(groupChatId);
+                                          },
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: _isReviewButtonVisible,
+                                        child: MaterialButton(
+                                          color: Colors.green,
+                                          child: const Text('LEAVE REVIEW'),
+                                          onPressed: () async {
+                                            showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: Text(
+                                                        "Please write a review"),
+                                                    content: Form(
+                                                      key: _formKey,
+                                                      child: Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: <Widget>[
+                                                          RatingBar(
+                                                            initialRating: 5,
+                                                            minRating: 1,
+                                                            direction:
+                                                                Axis.horizontal,
+                                                            allowHalfRating: true,
+                                                            itemCount: 5,
+                                                            itemPadding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        4.0),
+                                                            itemBuilder:
+                                                                (context, _) =>
+                                                                    Icon(
+                                                              Icons.star,
+                                                              color: Colors.amber,
+                                                            ),
+                                                            onRatingUpdate: (val) {
+                                                              print(val);
+                                                              setState(() {
+                                                                rating = val;
+                                                              });
+                                                            },
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsets.all(8.0),
+                                                            child: TextFormField(
+                                                              minLines: 3,
+                                                              maxLines: 6,
+                                                              onChanged: (val) {
+                                                                setState(() {
+                                                                  review = val;
+                                                                });
+                                                              },
+                                                              cursorColor:
+                                                                  Colors.green,
+                                                              decoration: InputDecoration(
+                                                                  hintText:
+                                                                      'Write something...',
+                                                                  hintStyle: TextStyle(
+                                                                      color: Colors
+                                                                          .grey),
+                                                                  focusColor:
+                                                                      Colors.green,
+                                                                  fillColor:
+                                                                      Colors.green,
+                                                                  hoverColor:
+                                                                      Colors.green,
+                                                                  enabledBorder: OutlineInputBorder(
+                                                                      borderSide: BorderSide(
+                                                                          color: Colors.green[
+                                                                              200])),
+                                                                  focusedBorder: OutlineInputBorder(
+                                                                      borderSide: BorderSide(
+                                                                          color: Colors.green[
+                                                                              100])),
+                                                                  errorBorder: OutlineInputBorder(
+                                                                      borderSide: BorderSide(
+                                                                          color: Colors.red[
+                                                                              700])),
+                                                                  labelStyle: TextStyle(
+                                                                      color: Colors.grey[700])),
+                                                              validator: (value) {
+                                                                if (value.isEmpty) {
+                                                                  return 'Please leave a review';
+                                                                }
+                                                                return null;
+                                                              },
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(8.0),
+                                                              child: RaisedButton(
+                                                                child: Text(
+                                                                  "SUBMIT",
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .white,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600),
+                                                                ),
+                                                                onPressed:
+                                                                    () async {
+                                                                  if (_formKey
+                                                                      .currentState
+                                                                      .validate()) {
+                                                                    _formKey
+                                                                        .currentState
+                                                                        .save();
+                                                                    dynamic
+                                                                        ratingFormData =
+                                                                        await chat.leaveReviewRequester(
+                                                                            roomData[
+                                                                                'serviceProviderUid'],
+                                                                            rating,
+                                                                            review,
+                                                                            roomData[
+                                                                                'requesterDisplayName'],
+                                                                            roomData[
+                                                                                'requesterPhotoUrl']);
+                                                                    await chat
+                                                                        .reviewStatusRequester(
+                                                                            groupChatId);
+
+                                                                    // If the form is valid, display a Snackbar.
+                                                                    if (ratingFormData ==
+                                                                        null) {
+                                                                      setState(() {
+                                                                        error =
+                                                                            'submit fail';
+                                                                      });
+                                                                    }
+                                                                    _scaffoldKey
+                                                                        .currentState
+                                                                        .showSnackBar(
+                                                                            SnackBar(
+                                                                      behavior:
+                                                                          SnackBarBehavior
+                                                                              .floating,
+                                                                      content: Text(
+                                                                          'Review submitted.'),
+                                                                    ));
+                                                                    Navigator.of(
+                                                                            context,
+                                                                            rootNavigator:
+                                                                                true)
+                                                                        .pop(true);
+                                                                  }
+                                                                },
+                                                              ))
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                });
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
-                              ),
-                            ],
-                          );
-                        }),
-              ),
+                              );
+                            }),
+                  ),
+                ),
+                buildListMessage(),
+                buildInput(),
+              ],
             ),
-            buildListMessage(),
-            buildInput(),
-          ],
-        ),
-      ),
+          ),
+        );
+      }
     );
   }
 }

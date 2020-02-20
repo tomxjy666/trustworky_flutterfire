@@ -63,6 +63,24 @@ class AuthService {
 
   }
 
+  Future<void> updateUserStatusOnline(String uid) {
+    DocumentReference userRef = _db.collection('users').document(uid);
+
+    return userRef.updateData({
+      'status': 'online',
+      'lastActivity': DateTime.now()
+    });
+  }
+
+  Future<void> updateUserStatusOffline(String uid) {
+    DocumentReference userRef = _db.collection('users').document(uid);
+
+    return userRef.updateData({
+      'status': 'offline',
+      'lastActivity': DateTime.now()
+    });
+  }
+
   Future<void> signOut() {
     return _auth.signOut();
   }
